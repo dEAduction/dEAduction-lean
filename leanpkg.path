@@ -1,0 +1,7 @@
+builtin_path
+path _target/deps/mathlib/src
+path ./src
+path ./src/snippets
+path ./src/snippets/exercises
+path ./src/snippets/definitions
+path ./src/snippets/tactics
