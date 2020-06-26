@@ -37,22 +37,23 @@ meta def debut_chaine : string × string → string × string
         end
 
 -- set_option trace.eqn_compiler.elim_match true
--- ne fonctionne pas : le "Prop" est ignoré, ou bien tout est Prop ??
--- meta def is_prop : expr →  bool
---     | `(%%e : Prop) := tt
-   --  | _             := ff
     
+/- When e is a pi or lambda expr, instanciate e returns 
+a local constant a that stands for the first bound variable,
+and the body of a with the free variable replaced by a -/
+meta def instanciate (e : expr) : tactic (expr × expr) :=
+match e with
+| (pi pp_name binder type body) := do 
+    a ← mk_local' pp_name binder type,
+    let inst_body := instantiate_var body a,
+    return (a , inst_body)
+| (lam pp_name binder type body) := do 
+    a ← mk_local' pp_name binder type,
+    let inst_body := instantiate_var body a,
+    return (a , inst_body)
+| _ := return (e, e)
+end
 
--- détermine si l'expression est une propriété
--- basé sur le fait (peut-être optimiste) que si on échoue à trouver le type, 
--- c'est qu'il y a des variables libres,
--- et donc que c'est une propriété
-meta def is_prop : expr →  tactic bool
-| e := do {
-    expr_t ←  infer_type e,
-    -- expr_tt ← infer_type expr_t,
-    if expr_t = `(Prop) then return tt else return ff
-        } <|> return tt
 
 
 /- Décompose la racine d'une expression (un seul pas) 
@@ -70,16 +71,12 @@ match e with
 | `(%%p ↔ %%q) := return ("PROP_IFF", [p,q])
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
-| `(%%p → %%q) :=   if deux_car(to_string e) = "Pi" then do match e with -- solution merdique
-                        | (pi name binder type body) :=  return ("QUANT_∀[" ++ to_string name ++ "]", [p,q]) 
-                        |  _ := return ("ERROR", [])  
-                        end                  
-                    else --if has_var p then  return ("IMPLIQUE", [p,q])  
-                         --else do t ← infer_type p,
-                         --if t = `(Prop) then return ("IMPLIQUE", [p,q])
-                         do bool ← is_prop e, 
-                         if bool then return ("PROP_IMPLIES", [p,q])
-                         else return ("FUNCTION", [p,q]) 
+| (pi name binder type body) := do let is_arr := is_arrow e,
+    if is_arr then do is_p ← tactic.is_prop e,
+                    if is_p then return ("PROP_IMPLIES", [type,body])
+                        else return ("FUNCTION", [type,body]) 
+     else do (var_, inst_body) ← instanciate e,
+               return ("QUANT_∀", [var_, type, inst_body]) 
 | `(Exists %%p) := do match p with          --  améliorer : cas d'une prop, mais attention aux variables !!
     | (lam name binder type body) := 
     -- la suite teste s'il s'agit de l'existence d'un objet ou d'une propriété
@@ -88,9 +85,10 @@ match e with
         -- si ce n'est pas le cas, on peut chercher son type, et voir si c'est Prop
         -- else do type_type ← infer_type type,
             -- if type_type = `(Prop) 
-            do bool ← is_prop p, if bool
-                then return ("PROP_∃[" ++ to_string name ++ "]", [type,body])
-                else return ("QUANT_∃[" ++ to_string name ++ "]", [type,body])
+            do (var_, inst_body) ← instanciate p,
+                is_p ← is_prop type, if is_p
+                then return ("PROP_∃", [var_, type, inst_body])
+                else return ("QUANT_∃", [var_, type, inst_body])
     |  _ := return ("ERROR", [])
     end 
 ------------------------- THEORIE DES ENSEMBLES -------------------------
@@ -211,7 +209,7 @@ private meta def analyse_expr : expr →  tactic string
 
 /- Affiche la liste des objets du contexte, séparés par des retour chariots 
 format :  "OBJET" ou "PROPRIETE" : affichage Lean : structure -/
-meta def analyse_contexte : tactic unit :=
+meta def hypo_analysis : tactic unit :=
 do liste_expr ← local_context,
     trace "context:",
     liste_expr.mmap (λ h, analyse_expr h >>= trace),
@@ -220,7 +218,7 @@ do liste_expr ← local_context,
 
 /- Affiche la liste des buts, même format que analyse_contexte
 (excepté qu'il n'y a que des PROPRIETES) -/ 
-meta def analyse_buts : tactic unit :=
+meta def goals_analysis : tactic unit :=
 do liste_expr ← get_goals,
     trace "goals:", 
     liste_expr.mmap (λ h, analyse_expr h >>= trace),
@@ -234,7 +232,7 @@ do liste_expr ← get_goals,
 
 
 /- Appelle l'analyse récursive sur le but ou sur une hypothèse. Non utilisé par la suite. -/
-meta def analyse (names : parse ident*) : tactic unit := 
+meta def analysis (names : parse ident*) : tactic unit := 
 match names with
     | [] := do goal ← tactic.target,
                 trace (analyse_rec goal)
@@ -255,7 +253,7 @@ match names with
     end
 
 /- Appelle l'analyse en 1 coup sur le but ou sur une hypothèse. Non utilisé par la suite. -/
-meta def analyse1 (names : parse ident*) : tactic unit := 
+meta def analysis1 (names : parse ident*) : tactic unit := 
 match names with
     | [] := do goal ← tactic.target,
                 trace (analyse_expr_step goal)
@@ -265,207 +263,4 @@ match names with
     | _ := skip
     end
 
-
--- non utilisé
-private meta def analyse_expr2 : expr →  tactic string
-| e := do
-    expr_t ←  infer_type e,
-    expr_tt ← infer_type expr_t,
-    if expr_tt = `(Prop) then do
-            S ←  (tactic.pp expr_t), 
-            let S1 := to_string S,
-            S2 ← analyse_rec expr_t,
-            let S3 := "PROPRIETE : " ++ S1 ++ " : " ++ S2,
-            return(S3)
-        else  do let S0 := "OBJET : ",
-            let S1 :=  to_string e, 
-            S2 ← analyse_rec expr_t,
-            let S3 := S0 ++ S1 ++ " : "++ S2,
-            return(S3)
-
-
-
-
-
-
-
----------------------------------------------------------
------------------ Essai de rendu LateX, non abouti ------
----------------------------------------------------------
-
-
-/- transforme une expression lean en expression latex
-AMELIORER : 
-tenir compte de la profondeur de l'arbre pour décider si on met des prenthèses-/
-/- ET, OU, SSI, QUELQUESOIT, IMPLIQUE, FONCTION, NON1, EXISTE,
-INTER, UNION, INCLUS, APPARTIENT, COMPLEMENTAIRE1, IMAGE_ENSEMBLE, IMAGE_RECIPROQUE, 
-EGALITE, ENSEMBLE1, APPLICATION-/
-meta def latex_expr : expr →  tactic string 
-| e := do
-    ⟨string, liste_expr⟩ ←  analyse_expr_step e, 
-    if list.length liste_expr =2 then do
-        let e1 := list.head liste_expr,
-        let e2 := list.head (list.tail liste_expr),
-        S1 ← latex_expr e1,
-        S2 ← latex_expr e2,
-        match string with
-            | "ET" := return (S1 ++ " et " ++ S2)
-            | "OU" := return (S1 ++ " ou " ++ S2)
-            | "SSI" := return ("(" ++ S1 ++ "" ++") \\Leftrightarrow (" ++ S2 ++ ")")
-
-            | "INCLUS" := return (S1 ++ "" ++" \\subset " ++ S2)
-            | _ := return "ERREUR"
-            end
-
-    else if list.length liste_expr =1 then do
-        let e1 := list.head liste_expr,
-        S1 ← latex_expr e1,
-        match string with
-            | "NON" := return ("NON (" ++ S1 ++ ")")
-            | "COMPLEMENTAIRE" := return (S1  ++ "^c")
-            | _ := return "ERREUR"
-            end
-    else return (string)
-
-
-
-
-meta def latex_buts : tactic unit :=
-do liste_expr ← get_goals,
-    trace "Buts :", 
-    -- liste_buts ← tactic.get_goals,
-    -- types ← list.mmap tactic.infer_type liste_buts, 
-    -- trace types,
-    liste_expr.mmap (λ h, latex_expr h >>= trace),
-    return ()
-
-meta def latex_but : tactic unit :=
-do expr ← target,
-    trace "But :", 
-    -- liste_buts ← tactic.get_goals,
-    -- types ← list.mmap tactic.infer_type liste_buts, 
-    -- trace types,
-    trace (latex_expr expr),
-    return ()
-
-
-
-----------------------------------------------
-------------- DEBUGGAGE -------------------
--------------------------------------------
-
-/- debug -/
-private meta def analyse_expr_step_brut  (e : expr) : tactic (string × (list expr)) := 
-match e with
--- autres
-| (pi name binder type body ) := return ("pi (nom : " ++ to_string name ++ ")",[type,body]) 
-| (app fonction argument)   := return ("application", [fonction,argument])
-| (const name list_level)   := return ("constante :" ++ to_string name, []) -- name → list level → expr
-| (var nat)       := return ("var_"++ to_string nat, []) --  nat → expr
-| (sort level)      := return ("sort", [])  -- level → expr
-| (mvar name pretty_name type)        := return ("metavar", []) -- name → name → expr → expr
-| (local_const name pretty_name bi type) := return ("constante_locale :" ++ to_string pretty_name, []) -- name → name → binder_info → expr → expr
-| (lam name binder type body)          := return ("lambda (nom : " ++ to_string name ++ ")", [type,body]) -- name → binder_info → expr → expr → expr
-| (elet name_var type_var expr body)        := return ("let", []) --name → expr → expr → expr → expr
-| (macro liste pas_compris)       := return ("macro", []) -- macro_def → list expr → expr
-end
-
-/-  Debug -/
-private meta def analyse_rec_brut : expr →  tactic string 
-| e := 
-do ⟨string, liste_expr⟩ ←  analyse_expr_step_brut e, 
-    match liste_expr with
-    -- ATTENTION, cas de plus de trois arguiments non traité
-    -- à remplacer par un list.map
-    |[e1] :=  do 
-       string1 ← analyse_rec_brut e1,
-       return(string ++ "(" ++ string1 ++ ")")
-    |[e1,e2] :=  do 
-        string1 ← analyse_rec_brut e1,
-        string2 ← analyse_rec_brut e2,
-        if  string = "APPLICATION" then do 
-            { type2 ← infer_type e2,
-            let string_type2 := to_string type2, -- trace string_type2, 
-            if (string_type2 = "Type" ) ∨ (trois_car (to_string(e2)) = "_in" ) -- Type  ou instance
-                then return (string1)
-                else return (string1 ++ "(" ++ string2 ++")")
-            }   <|> return (string1 ++ "(" ++ string2 ++")")
-            else return (string ++ "(" ++ string1 ++ "," ++ string2 ++ ")")
-    |[e1,e2,e3] :=  do  -- non utilisé
-        string1 ← analyse_rec_brut e1,
-        string2 ← analyse_rec_brut e2,
-        string3 ← analyse_rec_brut e3,
-        return (string ++ "(" ++ string1 ++ "," ++ string2 ++ "," ++ string3 ++ ")")
-    | _ :=    return(string)
-    end
-
-/- Debug -/
-meta def analyse_brut (names : parse ident*) : tactic unit := 
-match names with
-    | [] := do goal ← tactic.target,
-                trace (analyse_rec_brut goal)
-    | [nom] := do expr ← get_local nom,
-                expr_t ←  infer_type expr,
-                expr_tt ← infer_type expr_t,
-                -- la suite différencie selon la sémantique, 
-                -- ie les objets (éléments, ensembles, fonctions)
-                -- vs les propriétés
-                if expr_tt = `(Prop) then  
-                    trace (analyse_rec_brut expr_t)
-                else  do S1 ← (analyse_rec_brut expr), 
-                        S2 ← (analyse_rec_brut expr_t),
-                        --let S2 := to_string expr_t,
-                        let S3 := S1 ++ " : "++ S2,
-                        trace(S3)
-    | _ := skip
-    end
-
--- débug    
-private meta def analyse_expr_brut : expr →  tactic string
-| e := do
-    expr_t ←  infer_type e,
-    expr_tt ← infer_type expr_t,
-    if expr_tt = `(Prop) then do
-            S ←  (tactic.pp expr_t), 
-            let S1 := to_string S,
-            S2 ← analyse_rec_brut expr_t,
-            let S3 := "PROPRIETE : " ++ S1 ++ " : " ++ S2,
-            return(S3)
-        else  do let S0 := "OBJET : ",
-            let S1 :=  to_string e, 
-            S2 ← analyse_rec_brut expr_t,
-            let S3 := S0 ++ S1 ++ " : "++ S2,
-            return(S3)
-
-
-
-
-
-/- Affiche la liste des objets du contexte, séparés par des retour chariots 
-format :  "OBJET" ou "PROPRIETE" : affichage Lean : structure -/
-meta def analyse_contexte_brut : tactic unit :=
-do liste_expr ← local_context,
-    trace "Contexte :",
-    liste_expr.mmap (λ h, analyse_expr_brut h >>= trace),
-    return ()
-
-
-/- Analyse brute de Lean (dans expr) -/
-meta def analyse_raw (names : parse ident*) : tactic unit := 
-match names with
-    | [] := do goal ← tactic.target,
-                trace $ to_raw_fmt goal
-    | [nom] := do expr ← get_local nom,
-                expr_t ←  infer_type expr,
-                trace $ to_raw_fmt expr_t
-    | _ := skip
-    end
-
 end tactic.interactive
-
-#print set
-
-example (x:ℝ) :  x^2 ≥ 0 := 
-begin
-    analyse_contexte,
-end
