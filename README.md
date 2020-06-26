@@ -1,3 +1,3 @@
-# dEAduction-lean2
+# dEAduction-lean
 
 Lean part of the dEAduction projet.
