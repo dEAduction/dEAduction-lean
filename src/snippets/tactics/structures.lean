@@ -1,7 +1,6 @@
 import data.real.basic
 import data.set
 import tactic
-open push_neg
 
 
 
@@ -12,29 +11,14 @@ open interactive.types
 open tactic expr
 local postfix *:9001 := many -- sinon ne comprends pas ident*
 
-/- décompose en premier caractère, reste  INUTILISE-/
-def un_car : string → string × string
-| ⟨(x :: xs)⟩  := ( ⟨ [x] ⟩ , ⟨ xs ⟩ )
-| _ := ("","")
 
-def deux_car : string → string
-| ⟨(x ::  y :: xs)⟩  := ⟨ [x,y] ⟩ 
-| _ := ""
+def separator_comma := "¿, "
+def separator_equal := " ¿= "
+def open_paren := "¿("
+def closed_paren := "¿)"
+def open_bra := "¿["
+def closed_bra := "¿]"
 
-def trois_car : string → string
-| ⟨(x ::  y :: z ::xs)⟩  := ⟨ [x,y,z] ⟩ 
-| _ := ""
-
-/- décompose une chaine de caractères selon la première parenthèse ouvrante
-Le premier terme ne sert qu'à la récursivité  INUTILISE-/
-meta def debut_chaine : string × string → string × string
-| (s , t ) := do
-    let d := un_car t,
-    match d  with
-        | ("(",reste) :=  (s,t)
-        | ( ⟨(x)⟩, reste) :=  (debut_chaine (s ++ d.1, reste )) 
-        -- | _ := ("ERREUR", "")
-        end
 
 -- set_option trace.eqn_compiler.elim_match true
     
@@ -56,15 +40,10 @@ end
 
 
 
-/- Décompose la racine d'une expression (un seul pas) 
- LOGICS : ET, OU, SSI, QUELQUESOIT, IMPLIQUE, FONCTION, NON, EXISTE,
-SETS: INTER, UNION, INCLUS, APPARTIENT, COMPLEMENTAIRE1,s IMAGE_ENSEMBLE, IMAGE_RECIPROQUE, 
-EGALITE, ENSEMBLE1, APPLICATION
-NUMBERS: -/
+/- Décompose la racine d'une expression (un seul pas)  -/
 private meta def analyse_expr_step  (e : expr) : tactic (string × (list expr)) := 
 do  S ←  (tactic.pp e), let e_joli := to_string S, 
 match e with
-| (lam name binder type body)          := return ("lambda[" ++ to_string name ++ "]", [type,body]) -- name → binder_info → expr → expr → expr
 ------------------------- LOGIQUE -------------------------
 | `(%%p ∧ %%q) := return ("PROP_AND", [p,q])
 | `(%%p ∨ %%q) := return ("PROP_OR", [p,q])
@@ -72,23 +51,19 @@ match e with
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
 | (pi name binder type body) := do let is_arr := is_arrow e,
-    if is_arr then do is_p ← tactic.is_prop e,
-                    if is_p then return ("PROP_IMPLIES", [type,body])
-                        else return ("FUNCTION", [type,body]) 
+    if is_arr then do is_pro ← tactic.is_prop e,
+        if is_pro 
+            then return ("PROP_IMPLIES", [type,body])
+            else return ("FUNCTION", [type,body]) 
      else do (var_, inst_body) ← instanciate e,
                return ("QUANT_∀", [var_, type, inst_body]) 
-| `(Exists %%p) := do match p with          --  améliorer : cas d'une prop, mais attention aux variables !!
+| `(Exists %%p) := do match p with    
     | (lam name binder type body) := 
-    -- la suite teste s'il s'agit de l'existence d'un objet ou d'une propriété
-        -- d'abord, si `body` contient des variables libres, c'est une propriété
-        -- if type.has_var then return ("EXISTE[PROP:" ++ to_string name ++ "]", [type,body])
-        -- si ce n'est pas le cas, on peut chercher son type, et voir si c'est Prop
-        -- else do type_type ← infer_type type,
-            -- if type_type = `(Prop) 
             do (var_, inst_body) ← instanciate p,
-                is_p ← is_prop type, if is_p
-                then return ("PROP_∃", [var_, type, inst_body])
-                else return ("QUANT_∃", [var_, type, inst_body])
+                is_pro ← is_prop type, 
+                if is_pro
+                    then return ("PROP_∃", [var_, type, inst_body])
+                    else return ("QUANT_∃", [var_, type, inst_body])
     |  _ := return ("ERROR", [])
     end 
 ------------------------- THEORIE DES ENSEMBLES -------------------------
@@ -111,62 +86,45 @@ match e with
 | `(%%a ≠ %%b) := return ("PROP_EQUAL_NOT", [a,b]) -- faudrait connaitre le type ?
 ----------- TOPOLOGY --------------
 -- | `(B(%%x, %%r))
-
-
----------------------------- NOMBRES particuliers (cf aussi plus bas) 
-| `(0:ℝ) := return ("NUMBER[0]",[])               -- OK, mais peut-être faut-il garder l'info 0 : réel
-| `(0:ℕ) := return ("NUMBER[0]",[])               -- non testé
-| `(0:ℤ) := return ("NUMBER[0]",[])               -- non testé
-| `(1:ℝ) := return ("NUMBER[1]",[])               
-| `(1:ℕ) := return ("NUMBER[1]",[])               -- non testé
-| `(1:ℤ) := return ("NUMBER[1]",[])               -- non testé
 -- | `(0 < %%b) := return ("POSITIF", [b]) 
 | `(%%a < %%b) := return ("PROP_<", [a,b]) 
 | `(%%a ≤ %%b) := return ("PROP_≤", [a,b])
 -- | `(%%a > 0) := return ("POSITIF", [a])
 | `(%%a > %%b) := return ("PROP_>", [a,b]) 
 | `(%%a ≥ %%b) := return ("PROP_≥", [a,b]) 
------------------------------- Meta_applications
-
-| (app fonction argument)   := -- do let Sfonction := to_string(fonction),
-    -- pour les nombres, utiliser la pretty printer de Lean
-    -- récupérer le type ?
+------------------------------ Leaves with data ---------------------------
+---------------------------- NOMBRES particuliers (cf aussi plus bas) 
+--| `(0:ℝ) := return ("NUMBER[0]",[])               -- OK, mais peut-être faut-il garder l'info 0 : réel
+--| `(0:ℕ) := return ("NUMBER[0]",[])               -- non testé
+--| `(0:ℤ) := return ("NUMBER[0]",[])               -- non testé
+--| `(1:ℝ) := return ("NUMBER[1]",[])               
+--| `(1:ℕ) := return ("NUMBER[1]",[])               -- non testé
+--| `(1:ℤ) := return ("NUMBER[1]",[])               -- non testé
+| (app fonction argument)   := 
     if is_numeral e
-        then return ("NUMBER["++e_joli ++"]",[]) 
-    -- détecter les sous-ensembles
---    else if to_string(fonction) = "set.{0}"  
---        then return("SET", [argument])
---        else return("META_APPLICATION[[pp:" ++ e_joli ++"]]",[fonction,argument])
-        else return("APPLICATION",[fonction,argument])
+        then return ("NUMBER" ++ open_bra ++ e_joli ++ closed_bra, []) 
+        else return("APPLICATION", [fonction,argument])
 | `(ℝ) := return ("TYPE_NUMBER[ℝ]",[])
 | `(ℕ) := return ("TYPE_NUMBER[ℕ]",[])
-| (const name list_level)   := return ("CONSTANT[name:"++ e_joli ++ "/" ++ to_string name ++"]", []) -- name → list level → expr
-| (var nat)       := return ("VAR["++ to_string nat ++ "]", []) --  nat → expr
-| (sort level)      := return ("TYPE", [])  -- level → expr
-| (mvar name pretty_name type)        := return ("METAVAR[" ++ to_string pretty_name ++ "]", []) -- name → name → expr → expr
-| (local_const name pretty_name bi type) := return ("LOCAL_CONSTANT[name:"++ to_string pretty_name++"/identifier:"++ to_string name ++ "]", []) -- name → name → binder_info → expr → expr
-| (elet name_var type_var expr body)        := return ("LET["++ to_string name_var ++"]", [type_var,expr,body]) --name → expr → expr → expr → expr
-| (macro liste pas_compris)       := return ("MACRO", []) -- macro_def → list expr → expr
+| (const name list_level)   := return ("CONSTANT" ++ open_bra ++ "name:" 
+    ++ e_joli ++ "/" ++ to_string name ++ closed_bra, []) 
+| (sort level)      := return ("TYPE", [])  
+| (local_const name pretty_name bi type) := return ("LOCAL_CONSTANT" ++ open_bra 
+    ++ "name:" ++ to_string pretty_name ++ "/identifier:" ++ to_string name ++ closed_bra, []) 
+---------------- Useless for dEAduction ? -------------
+| (var nat)       := return ("VAR" ++ open_bra ++ to_string nat ++ closed_bra, []) 
+| (mvar name pretty_name type)        := return ("METAVAR[" ++ to_string pretty_name ++ "]", []) 
+| (elet name_var type_var expr body)        := return ("LET["++ to_string name_var ++"]", [type_var,expr,body]) 
+| (macro liste pas_compris)       := return ("MACRO", []) 
+| (lam name binder type body)          := return ("lambda[" ++ to_string name ++ "]", [type,body]) 
 end
 
--- A node will be a leaf of the analysis tree iff it belongs to the following list:
--- leaves = ["NOMBRE", "CONSTANT", "VAR", "TYPE", "METAVAR", "LOCAL_CONSTANT", 
---          "LET", "MACRO", "ERREUR"]    
--- A leaf is followed by a separateur_virgule or a ")"
--- A node which is not a leaf is followed by a "("
 
-
-def separateur_virgule := "¿, "
-def separateur_egale := " ¿= "
-def open_paren := "¿("
-def closed_paren := "¿)"
 /- Analyse récursivement une expression à l'aide de analyse_expr_step, 
 renvoie le résultat sous forme de chaine bien parenthésée-/
 private meta def analyse_rec : expr →  tactic string 
 | e := 
 do ⟨string, liste_expr⟩ ←  analyse_expr_step(e), 
---    bool ← is_prop e,
---    let string := to_string bool ++ "." ++ string,
     match liste_expr with
     -- ATTENTION, cas de plus de trois arguiments non traité
     -- à remplacer par un list.map
@@ -178,32 +136,32 @@ do ⟨string, liste_expr⟩ ←  analyse_expr_step(e),
         string2 ← analyse_rec e2,
 --        if  string = "APPLICATION"
 --            then return (string1 ++ open_paren ++ string2 ++ closed_paren) else
-        return (string ++ open_paren ++ string1 ++ separateur_virgule ++ string2 ++ closed_paren)
-    |[e1,e2,e3] :=  do  -- non utilisé
+        return (string ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ closed_paren)
+    |[e1,e2,e3] :=  do  
         string1 ← analyse_rec e1,
         string2 ← analyse_rec e2,
         string3 ← analyse_rec e3,
-        return (string ++ open_paren ++ string1 ++ separateur_virgule ++ string2 ++ separateur_virgule ++ string3 ++ closed_paren)
+        return (string ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ separator_comma ++ string3 ++ closed_paren)
     | _ :=    return(string)
     end
 private meta def analyse_expr : expr →  tactic string
 | e := do
     expr_t ←  infer_type e,
-    bool ← is_prop expr_t,
+    is_pro ← is_prop expr_t,
     -- expr_tt ← infer_type expr_t,
-    if bool then do
+    if is_pro then do
             -- S ←  (tactic.pp expr_t), 
             -- let S1 := to_string S,
             S ←  (tactic.pp expr_t), let et_joli := to_string S, 
             S1b ← analyse_rec e,
             S2 ← analyse_rec expr_t,
-            let S3 := "PROPERTY[" ++ S1b ++ "/pp_type: " ++ et_joli ++ "]" ++ separateur_egale ++ S2,
+            let S3 := "PROPERTY[" ++ S1b ++ "/pp_type: " ++ et_joli ++ "]" 
+                ++ separator_equal ++ S2,
             return(S3)
         else  do
-            -- let S1 :=  to_string e, 
             S1b ← analyse_rec e,
             S2 ← analyse_rec expr_t,
-            let S3 := "OBJECT[" ++ S1b ++ separateur_egale ++ S2,
+            let S3 := "OBJECT[" ++ S1b ++ "]" ++ separator_equal ++ S2,
             return(S3)
 
 
