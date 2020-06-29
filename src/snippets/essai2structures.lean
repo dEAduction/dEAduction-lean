@@ -47,12 +47,6 @@ meta def debut_chaine : string × string → string × string
 -- basé sur le fait (peut-être optimiste) que si on échoue à trouver le type, 
 -- c'est qu'il y a des variables libres,
 -- et donc que c'est une propriété
-meta def is_prop : expr →  tactic bool
-| e := do {
-    expr_t ←  infer_type e,
-    -- expr_tt ← infer_type expr_t,
-    if expr_t = `(Prop) then return tt else return ff
-        } <|> return tt
 
 -- test if expr is semantically an implication or a function 
 -- (as opposed to a "∀" expression )
@@ -71,6 +65,23 @@ match e with
     return $ instantiate_var body a
 | _ := return e
 end
+
+
+meta def instanciate' (e : expr) : tactic (expr × expr) :=
+match e with
+| (pi pp_name binder type body) := do 
+    a ← mk_local' pp_name binder type,
+    let inst_body := instantiate_var body a,
+    return (a , inst_body)
+| (lam pp_name binder type body) := do 
+    a ← mk_local' pp_name binder type,
+    let inst_body := instantiate_var body a,
+    return (a , inst_body)
+| _ := return (e, e)
+end
+
+
+
 
 open tactic
 example : true :=
@@ -96,12 +107,12 @@ match e with
 | `(%%p ↔ %%q) := return ("PROP_IFF", [p,q])
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
-| (pi name binder type body) := do bool ←  (is_arrow' e),
-    if bool then do bool2 ← tactic.is_prop e,
-                    if bool2 then return ("PROP_IMPLIES", [type,body])
+| (pi name binder type body) := do is_arr ←  (is_arrow' e),
+    if is_arr then do is_p ← tactic.is_prop e,
+                    if is_p then return ("PROP_IMPLIES", [type,body])
                         else return ("FUNCTION", [type,body]) 
-     else do inst_body ← instanciate e,
-       return ("QUANT_∀[" ++ to_string name ++ "]", [type, inst_body]) 
+     else do (var_, inst_body) ← instanciate' e,
+               return ("QUANT_∀", [var_, type, inst_body]) 
 | `(Exists %%p) := do match p with          --  améliorer : cas d'une prop, mais attention aux variables !!
     | (lam name binder type body) := 
     -- la suite teste s'il s'agit de l'existence d'un objet ou d'une propriété
@@ -110,10 +121,10 @@ match e with
         -- si ce n'est pas le cas, on peut chercher son type, et voir si c'est Prop
         -- else do type_type ← infer_type type,
             -- if type_type = `(Prop) 
-            do inst_body ← instanciate p,
-                bool ← is_prop p, if bool
-                then return ("PROP_∃[" ++ to_string name ++ "]", [type,inst_body])
-                else return ("QUANT_∃[" ++ to_string name ++ "]", [type,inst_body])
+            do (var_, inst_body) ← instanciate' p,
+                is_p ← is_prop type, if is_p
+                then return ("PROP_∃", [var_, type, inst_body])
+                else return ("QUANT_∃", [var_, type, inst_body])
     |  _ := return ("ERROR", [])
     end 
 ------------------------- THEORIE DES ENSEMBLES -------------------------
