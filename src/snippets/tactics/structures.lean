@@ -50,20 +50,22 @@ match e with
 | `(%%p ↔ %%q) := return ("PROP_IFF", [p,q])
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
+| `(ℕ → %%X) := return ("SEQUENCE", [X])
+| `(%%I → _root_.set %%X) := return ("SET_FAMILY", [I,X])
 | (pi name binder type body) := do let is_arr := is_arrow e,
     if is_arr then do is_pro ← tactic.is_prop e,
         if is_pro 
             then return ("PROP_IMPLIES", [type,body])
             else return ("FUNCTION", [type,body]) 
      else do (var_, inst_body) ← instanciate e,
-               return ("QUANT_∀", [var_, type, inst_body]) 
+               return ("QUANT_∀", [type, var_, inst_body]) 
 | `(Exists %%p) := do match p with    
     | (lam name binder type body) := 
             do (var_, inst_body) ← instanciate p,
                 is_pro ← is_prop type, 
                 if is_pro
-                    then return ("PROP_∃", [var_, type, inst_body])
-                    else return ("QUANT_∃", [var_, type, inst_body])
+                    then return ("PROP_∃", [type, inst_body]) -- we do not care about var_
+                    else return ("QUANT_∃", [type, var_, inst_body])
     |  _ := return ("ERROR", [])
     end 
 ------------------------- THEORIE DES ENSEMBLES -------------------------
@@ -104,13 +106,15 @@ match e with
     if is_numeral e
         then return ("NUMBER" ++ open_bra ++ e_joli ++ closed_bra, []) 
         else return("APPLICATION", [fonction,argument])
-| `(ℝ) := return ("TYPE_NUMBER[ℝ]",[])
-| `(ℕ) := return ("TYPE_NUMBER[ℕ]",[])
+| `(ℝ) := return ("TYPE_NUMBER" ++ open_bra 
+    ++ "name:ℝ" ++ closed_bra,[])
+| `(ℕ) := return ("TYPE_NUMBER"++ open_bra 
+    ++ "name:ℕ" ++ closed_bra,[])
 | (const name list_level)   := return ("CONSTANT" ++ open_bra ++ "name:" 
     ++ e_joli ++ "/" ++ to_string name ++ closed_bra, []) 
 | (sort level)      := return ("TYPE", [])  
 | (local_const name pretty_name bi type) := return ("LOCAL_CONSTANT" ++ open_bra 
-    ++ "name:" ++ to_string pretty_name ++ "/identifier:" ++ to_string name ++ closed_bra, []) 
+    ++ "name:" ++ to_string pretty_name ++ "/identifier:" ++ to_string name ++ closed_bra, [type]) 
 ---------------- Useless for dEAduction ? -------------
 | (var nat)       := return ("VAR" ++ open_bra ++ to_string nat ++ closed_bra, []) 
 | (mvar name pretty_name type)        := return ("METAVAR[" ++ to_string pretty_name ++ "]", []) 

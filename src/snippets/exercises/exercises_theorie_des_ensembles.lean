@@ -1,7 +1,10 @@
 import data.set
 import tactic
+
+-- dEAduction imports
 import logics
 import definitions
+import definitions_theorie_des_ensembles
 import structures
 
 
@@ -9,21 +12,31 @@ local attribute [instance] classical.prop_decidable
 
 
 --------------------------------
--- Commentaire deaduc : lignes à récupérer pour structurer la liste d'exercices
+-- Commentaire dev deaduction (CDD) : lignes à récupérer pour structurer la liste d'exercices
 -- pendant les exos qui suivent, le logiciel affichera en titre : 
 -- Théorie des ensembles (1) Ensembles
 -- Puis, plus loin,
 -- Théorie des ensembles (2) Applications
+-- A parser : 
+    -- sections
+    -- @EXERCISE
 
+
+-- CDD : parser les sections
 section theorie_des_ensembles
+/- @Definitions
+STANDARDLOGIC
+∀, ∃, →, ↔, ET, OU, NON, 
+Preuve par l'absurde, Preuve par contraposée, Preuve par cas, Choix
+-/
 
 
--- Commentaire deaduc : les deux lignes qui suivent indiquent les boutons à intégrer dans les zones correspondantes
+-- CDD : les deux lignes qui suivent indiquent les boutons à intégrer dans les zones correspondantes
 -- pour tous les exercices de la section
--- @DEFINITIONS theorie_des_ensembles
+-- @Definitions theorie_des_ensembles
 -- (inclure toutes les définitions de la section "théorie des ensemble",
 -- i.e. celles dont le nom commence par "definitions.theorie_des_ensembles")
--- @LOGIQUE ∀, ∃, →, ↔, ET, OU, NON, contradiction
+-- 
 
 -----------------------------------------
 -----------------------------------------
@@ -33,7 +46,18 @@ section unions_et_intersections  -- sous-section 1
 
 variables {X : Type} {A B C : set X}
 
-/- @EXERCICE : L'intersection est distributive par rapport à l'union -/
+/- @Exercise
+Intersection d'unions
+@TextDescription
+L'intersection est distributive par rapport à l'union
+@Buttons
+(Logic)
+STANDARDLOGIC -Contradiction +Preuve-par-cas
+(Definitions)
+(Theorems)
+@ExpectedVariables
+2
+-/
 lemma union_distributive_inter : A ∩ (B ∪ C)  = (A ∩ B) ∪ (A ∩ C) := 
 begin
     defi double_inclusion, ET,
@@ -70,6 +94,8 @@ end
 /- @EXERCICE L'union est distributive par rapport à l'intersection -/
 lemma inter_distributive_union : A ∪ (B ∩ C)  = (A ∪ B) ∩ (A ∪ C) := 
 begin
+    hypo_analysis,
+    goals_analysis,
     sorry
 end
 
@@ -89,16 +115,23 @@ variables {I : Type} {E F : I → set X}
 /- @EXERCICE Tout ensemble est égal au complémentaire de son complémentaire-/
 lemma complement_complement : - - A =A :=
 begin
+    hypo_analysis,
     sorry
 end
 
 /- @EXERCICE Le complémentaire de l'union de deux ensembles égale l'intersection des complémentaires -/
 lemma complement_union_deux : @has_neg.neg (set X) _ (A ∪ B) = (- A) ∩ (- B) :=
-begin
+begin    
     hypo_analysis,
     goals_analysis,
     sorry
 end
+
+lemma ex : 2+2 =4 :=
+begin
+
+end
+
 
 
 
@@ -210,6 +243,8 @@ begin
     defi double_inclusion,
     ET,
         defi inclusion,
+        hypo_analysis,
+        goals_analysis,
         qqs x,
         implique,
         defi image_reciproque at H,
@@ -282,6 +317,11 @@ begin
     existeintro a, ET,
     assumption, assumption,
 end
+
+
+/- @EXERCICE L'image réciproque du complémentaire 
+égale le complémentaire de l'image réciprqque-/
+
 
 end applications
 
