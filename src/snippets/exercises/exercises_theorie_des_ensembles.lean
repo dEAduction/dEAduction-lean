@@ -12,22 +12,32 @@ local attribute [instance] classical.prop_decidable
 
 
 --------------------------------
--- Commentaire dev deaduction (CDD) : lignes à récupérer pour structurer la liste d'exercices
+-- Commentaire deaduction:
+-- le logiciel parse les sections (*todo*) et les définitions
+-- on peut définir des liste (macros) dans des docstrings, syntaxe
+-- @Macro
+-- suivi du nom de la macro sur une ligne seule,
+-- suive de la liste qui finit à la fin du docstring
+-- The lemmas that will serve as exercises are tagged by @Exercise
+-- followed by the title on a single line
+-- followed by a text description preceded by @Description
+-- followed by macros representing the list of active buttons in each window
+
 -- pendant les exos qui suivent, le logiciel affichera en titre : 
 -- Théorie des ensembles (1) Ensembles
 -- Puis, plus loin,
 -- Théorie des ensembles (2) Applications
--- A parser : 
-    -- sections
-    -- @EXERCISE
 
 
--- CDD : parser les sections
-section theorie_des_ensembles
-/- @Definitions
-STANDARDLOGIC
+
+
+
+
+/- 
+@Macro
+STANDARD_LOGIC
 ∀, ∃, →, ↔, ET, OU, NON, 
-Preuve par l'absurde, Preuve par contraposée, Preuve par cas, Choix
+Absurde, Contraposée, Par cas, Choix
 -/
 
 
@@ -46,15 +56,18 @@ section unions_et_intersections  -- sous-section 1
 
 variables {X : Type} {A B C : set X}
 
-/- @Exercise
+/- 
+@Exercise
 Intersection d'unions
-@TextDescription
+@Description
 L'intersection est distributive par rapport à l'union
-@Buttons
-(Logic)
-STANDARDLOGIC -Contradiction +Preuve-par-cas
-(Definitions)
-(Theorems)
+@Macro
+LOGIC
+STANDARD_LOGIC +Contradiction -Choix
+-- @Macro
+-- DEFINITIONS
+-- @Macro
+-- THEOREM
 @ExpectedVariables
 2
 -/
@@ -91,7 +104,12 @@ begin
   tautology,
 end
 
-/- @EXERCICE L'union est distributive par rapport à l'intersection -/
+/- 
+@Exercise
+Union d'intersections
+@Description
+L'union est distributive par rapport à l'intersection 
+-/
 lemma inter_distributive_union : A ∪ (B ∩ C)  = (A ∪ B) ∩ (A ∪ C) := 
 begin
     hypo_analysis,
@@ -112,14 +130,24 @@ variables {I : Type} {E F : I → set X}
 -- notation  ` \` Z := has_neg.neg Z   
 -- notation `\ ` Z := -Z
 
-/- @EXERCICE Tout ensemble est égal au complémentaire de son complémentaire-/
+/- 
+@Exercise
+Complémentaire du complémentaire
+@Description
+Tout ensemble est égal au complémentaire de son complémentaire
+-/
 lemma complement_complement : - - A =A :=
 begin
     hypo_analysis,
     sorry
 end
 
-/- @EXERCICE Le complémentaire de l'union de deux ensembles égale l'intersection des complémentaires -/
+/- 
+@Exercise
+Complémentaire d'union I
+@Description
+Le complémentaire de l'union de deux ensembles égale l'intersection des complémentaires 
+-/
 lemma complement_union_deux : @has_neg.neg (set X) _ (A ∪ B) = (- A) ∩ (- B) :=
 begin    
     hypo_analysis,
@@ -127,15 +155,14 @@ begin
     sorry
 end
 
-lemma ex : 2+2 =4 :=
-begin
-
-end
 
 
-
-
-/- @EXERCICE Le complémentaire d'une réunion quelconque égale l'intersection des complémentaires -/
+/- 
+@Exercise
+Complémentaire d'union II
+@Description
+Le complémentaire d'une réunion quelconque égale l'intersection des complémentaires 
+-/
 open set
 -- set_option pp.all true
 lemma complement_union_quelconque  (H : ∀ i, F i = - E i) : - (Union E) = Inter F :=
