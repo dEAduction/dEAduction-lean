@@ -1,4 +1,3 @@
-
 import tactic
 import data.real.basic
 import data.set
@@ -16,7 +15,7 @@ namespace definitions
 
 
 ------------------ Numbers -------------------
-section numbers
+section nombres
 lemma minimum (a b m :ℝ) : m = min a b ↔ (m=a ∨ m=b) ∧ m ≤ a ∧ m ≤ b := 
 begin
 by_cases a ≤ b,
@@ -41,7 +40,7 @@ assumption
 end
 
 
-end numbers
+end nombres
 
 
 end definitions

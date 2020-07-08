@@ -3,9 +3,12 @@ import tactic
 
 -- dEAduction imports
 import logics
-import definitions
-import definitions_theorie_des_ensembles
 import structures
+import definitions
+
+-- @Definitions
+import definitions_test
+
 
 
 /-
@@ -22,10 +25,10 @@ section unions_et_intersections -- sous-section 1
 @Title = Intersection d'unions
 @Description = L'intersection est distributive par rapport à l'union \
 et ça continue sur la ligne suivante
-@Macro LOGIC = STANDARD_LOGIC +Contradiction -Choix \
+@Buttons LOGIC = STANDARD_LOGIC +Contradiction -Choix \
 +Toto
-@Macro DEFINITIONS = union, intersection
-@Macro       THEOREM    =   Zorn
+@Buttons DEFINITIONS = union, intersection
+@Buttons       THEOREM    =   Zorn
 @ExpectedVariables = X=3 A=2
 -/
 lemma union_distributive_inter (X : Type) (A B C : set X) : A ∩ (B ∪ C)  = (A ∩ B) ∪ (A ∩ C) := 
