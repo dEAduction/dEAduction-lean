@@ -2,7 +2,6 @@ import tactic
 import data.real.basic
 import data.set
 import data.set.lattice
-import tactic
 import logics
 
 
@@ -67,120 +66,59 @@ match names with
     | _ := fail "Il faut deux paramètres exactement"
     end
 
+private meta def is_theorem : declaration → bool
+| (declaration.defn _ _ _ _ _ _) :=  ff
+| (declaration.thm _ _ _ _) := tt
+| (declaration.cnst _ _ _ _) := ff
+| (declaration.ax _ _ _) := tt
+
+private meta def get_all_theorems : tactic (list name) := 
+do
+    env ← tactic.get_env,
+    pure (environment.fold env [] (λ decl nams,
+         if is_theorem decl then 
+            declaration.to_name decl :: nams
+         else 
+            nams))
+
+private meta def name.get_ante_suffix : name → name
+| (name.mk_string s1 (name.mk_string s2 p))  := s2
+| (name.mk_numeral s1 (name.mk_string s2 p)) := s2
+| p := name.anonymous
+
+private meta def is_definition_as (n : name) : tactic bool :=
+if (name.get_ante_suffix n = "definition") then return tt else return ff
+
+private meta def is_exercise_as (n : name) : tactic bool :=
+if (name.get_ante_suffix n = "exercise") then return tt else return ff
+
+private meta def is_theorem_as (n : name) : tactic bool :=
+if (name.get_ante_suffix n = "theorem") then return tt else return ff
+
+meta def print_all_definitions : tactic unit :=
+do
+    nams ← get_all_theorems,
+    def_nams ← list.mfilter is_definition_as nams,
+    def_nams.mmap (λ h, tactic.trace h),
+    return ()
+
+meta def print_all_exercises : tactic unit :=
+do
+    nams ← get_all_theorems,
+    def_nams ← list.mfilter is_exercise_as nams,
+    def_nams.mmap (λ h, tactic.trace h),
+    return ()
+
+meta def print_all_theorems : tactic unit :=
+do
+    nams ← get_all_theorems,
+    def_nams ← list.mfilter is_theorem_as nams,
+    def_nams.mmap (λ h, tactic.trace h),
+    return ()
+
+
+
+
 
 end tactic.interactive
-
-
-------------- Lemmes définitionnels ---------------
-namespace definitions
-
-
------------- Théorie des ensembles --------------
-section theorie_des_ensembles
-
-variables {X : Type} {Y : Type}
--- mem_compl_iff
---lemma complement {A : set X} {x : X} : x ∈ - A ↔ ¬ x ∈ A :=
---iff.rfl
-
-lemma complement {A : set X} {x : X} : x ∈ set.univ \ A ↔ x ∉ A := 
-by finish
-
-lemma complement_1 {A : set X} {x : X} : x ∈ set.compl A ↔ x ∉ A := 
-by finish
-
-lemma complement_2 {A B : set X} {x : X} : x ∈ B \ A ↔ (x ∈ B ∧ x ∉ A) :=
-iff.rfl
-
-lemma inclusion (A B : set X) : A ⊆ B ↔ ∀ {{x:X}}, x ∈ A → x ∈ B := 
-iff.rfl
-
-lemma intersection_deux  (A B : set X) (x : X) :  x ∈ A ∩ B ↔ ( x ∈ A ∧ x ∈ B) := 
-iff.rfl
-
--- bof : ce n'est pas une définition, mais une caractérisation
-lemma intersection_ensemble  (A B C : set X) : C ⊆ A ∩ B ↔ C ⊆ A ∧ C ⊆ B := 
-begin
-    exact ball_and_distrib
-end
-
-lemma intersection_quelconque (I : Type) (O : I → set X)  (x : X) : (x ∈ set.Inter O) ↔ (∀ i:I, x ∈ O i) :=
-set.mem_Inter
-
--- Les deux lemmes suivants seront à regroupé au sein d'une même tactique : essayer le premier, 
--- en cas d'échec essayer le second. Un seul bouton dans l'interface graphique
-lemma union  (A : set X) (B : set X) (x : X) :  x ∈ A ∪ B ↔ ( x ∈ A ∨ x ∈ B) := 
-iff.rfl
-
-lemma union_quelconque (I : Type) (O : I → set X)  (x : X) : (x ∈ set.Union O) ↔ (∃ i:I, x ∈ O i) :=
-set.mem_Union
-
-
--- mem_image_iff_bex
-lemma image  (A : set X)  (f : X → Y) (b : Y) : b ∈ f '' A ↔  ∃ a, a ∈ A ∧ f(a) = b :=
-begin
-    tidy,
-end
-
-lemma image_reciproque  {B : set Y}  {f : X → Y} {a : X} :
-                             a ∈ f ⁻¹' B ↔  f a ∈ B :=
-                             iff.rfl
-
-lemma ensemble_egal {A A' : set X} : (A = A') ↔ ( ∀ x, x ∈ A ↔ x ∈ A' ) :=
-by exact set.ext_iff
-
-lemma double_inclusion {A A' : set X} : (A = A') ↔ (A ⊆ A' ∧ A' ⊆ A) :=
-begin
-    exact le_antisymm_iff
-end
-
-
-end theorie_des_ensembles
-
--------------------- LOGIQUE -----------------------
-section logique
-lemma double_implication (P Q : Prop) : (P ↔ Q) ↔ (P → Q) ∧ (Q → P) := by tautology
-
-
-end logique
-
-set_option trace.simplify.rewrite true
--- set_option pp.all true
------------------- Nombres -------------------
-section nombres
-lemma minimum (a b m :ℝ) : m = min a b ↔ (m=a ∨ m=b) ∧ m ≤ a ∧ m ≤ b := 
-begin
-by_cases a ≤ b,
-    simp only [h, min_eq_left],
-    split, intro H, rw H, finish,
-    finish,
-    
-push_neg at h, 
-have H : min a b = b, by exact min_eq_right_of_lt h,
-rw H,
-    split,
-    intro H', split, 
-        finish,
-    rw H', split, linarith only [h], 
-    exact le_refl b,
-rintro ⟨ H1, H2, H3 ⟩,
-cases H1 with Ha Hb,
-    exfalso, 
-    rw Ha at H3,
-    linarith only [h, H3],
-assumption
-end
-
-
-end nombres
------------------- Topologie -------------------
-
-
-
-
-
-
-
-------------------------------------------------
-end definitions
 

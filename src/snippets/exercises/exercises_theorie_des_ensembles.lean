@@ -53,6 +53,11 @@ Absurde, Contraposée, Par cas, Choix
 section unions_et_intersections  -- sous-section 1
 -----------------------------------------
 -----------------------------------------
+namespace definitions.unions_et_intersections
+
+
+
+
 
 variables {X : Type} {A B C : set X}
 
@@ -75,7 +80,11 @@ lemma union_distributive_inter : A ∩ (B ∪ C)  = (A ∩ B) ∪ (A ∩ C) :=
 begin
     defi double_inclusion, ET,
     defi inclusion, qqs a, implique,
+    hypo_analysis,
+    goals_analysis,
     defi intersection_deux at H,
+    hypo_analysis,
+    goals_analysis,
     ET H,
     defi union at HB,
     OU HB,

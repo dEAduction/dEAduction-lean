@@ -25,6 +25,7 @@ variables {X : Type} {Y : Type}
 lemma complement {A : set X} {x : X} : x ∈ set.univ \ A ↔ x ∉ A := 
 by finish
 
+-- @Excluded
 lemma complement_1 {A : set X} {x : X} : x ∈ set.compl A ↔ x ∉ A := 
 by finish
 
@@ -75,12 +76,5 @@ end
 
 
 end theorie_des_ensembles
-
--------------------- LOGIQUE -----------------------
-section logique
-lemma double_implication (P Q : Prop) : (P ↔ Q) ↔ (P → Q) ∧ (Q → P) := by tautology
-
-
-end logique
 
 end definitions
