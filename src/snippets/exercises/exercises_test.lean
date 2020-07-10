@@ -9,7 +9,7 @@ import definitions
 import definitions_test
 
 /- dEAduction
-STANDARD_LOGIC 
+$STANDARD_LOGIC 
     ∀, ∃, →, ↔, ET, OU, NON, 
     Absurde, Contraposée, Par_cas, Choix
 -/
@@ -19,7 +19,7 @@ STANDARD_LOGIC
 namespace set_theory -- Course title
 /- dEAduction
 Section
-    Theory
+    Set Theory
 -/
 ----------------------------------------------
 namespace unions_and_intersections -- section 1
@@ -37,11 +37,12 @@ Description
     L'intersection est distributive par rapport à l'union
     et ça continue sur la ligne suivante
 Tools->Logic
-    STANDARD_LOGIC +Contradiction -Choix
+    $STANDARD_LOGIC +Contradiction -Choix
     +Toto
-Tools->Statements
-    union, intersection
-    Zorn
+Tools->Definitions
+    union, intersection_deux
+Tools->Theorems
+    double_inclusion, Riemann_hypothesis
 ExpectedVariables 
     X=3, A=1, B=1
 -/
@@ -59,7 +60,9 @@ Title
 Description 
     L'union est distributive par rapport à l'intersection 
 Tools->Logic 
-    STANDARD_LOGIC -Par_cas
+    $STANDARD_LOGIC -Par_cas
+Tools->Definitions
+    $ALL
 -/
 begin
     hypo_analysis,
