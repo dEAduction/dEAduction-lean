@@ -177,7 +177,8 @@ end
 
 #print set
 
-example (X : Type) (x : X) (A : set $ set X) (B : X → Prop) (a : A) : X := 
+example (X : Type) (x : X) (A : set $ set X)
+ (B : X → Prop) (a : A) : X := 
 begin
     hypo_analysis,
     
