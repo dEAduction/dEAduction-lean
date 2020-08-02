@@ -176,7 +176,7 @@ begin
 end
 
 -- set_option pp.all true
-lemma exercise.complement_union_quelconque  (H : ∀ i, F i = set.compl (E i)) : set.compl (Union E) = Inter F :=
+lemma exercise.complement_union_quelconque  (H : ∀ i, F i = set.compl (E i)) : set.compl (set.Union E) = set.Inter F :=
 /- dEAduction
 PrettyName
     Complémentaire d'union II    
@@ -188,7 +188,7 @@ begin
 end
 
 lemma exercise.complement_intersection_quelconque  (H : ∀ i, F i = set.compl (E
- i)) : set.compl (Inter E) = Union F :=
+ i)) : set.compl (set.Inter E) = set.Union F :=
 /- dEAduction
 PrettyName
     
@@ -244,12 +244,14 @@ variables {I : Type} {E : I → set X} {F : I → set Y}
 -- DEFINITIONS --
 -----------------
 lemma definition.image_directe (y : Y) : y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
+/- dEAduction -/
 begin
     unfold set.image,
     sorry
 end
 
 lemma definition.image_reciproque (x:X) : x ∈ f  ⁻¹' B ↔ f(x) ∈ B :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -259,22 +261,26 @@ end
 -- EXERCICES --
 ---------------
 lemma exercise.image_de_reciproque : f '' (f ⁻¹' B)  ⊆ B :=
+/- dEAduction -/
 begin
   sorry
 end
 
 lemma exercise.reciproque_de_image : A ⊆ f ⁻¹' (f '' A) :=
+/- dEAduction -/
 begin
-    intros x H,
+    sorry
 end
 
 lemma exercise.image_reciproque_inter :  f ⁻¹'  (B∩B') = f ⁻¹'  (B) ∩ f ⁻¹'  (B') :=
+/- dEAduction -/
 begin
     sorry
 end
 
 lemma  exercise.image_reciproque_union  : f ⁻¹' (B ∪ B') = f ⁻¹' B ∪ f ⁻¹' B'
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -282,6 +288,7 @@ end
 lemma exercise.image_reciproque_inter_quelconque (H : ∀ i:I,  (E i = f ⁻¹' (F i))) :
 (f ⁻¹'  (set.Inter F)) = set.Inter E
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -320,6 +327,7 @@ def composition (g₀ : Y → Z) (f₀ : X → Y) := λx:X, g₀ (f₀ x)
 lemma definition.injective :
 injective f ↔ ∀ x y : X, (f x = f y → x = y)
 :=
+/- dEAduction -/
 begin
     unfold injective,
 end
@@ -327,6 +335,7 @@ end
 lemma definition.surjective :
 surjective f ↔ ∀ y : Y, ∃ x : X, f x = y
 :=
+/- dEAduction -/
 begin
     unfold surjective,
 end
@@ -347,6 +356,7 @@ lemma exercise.composition_injections (H0 : h = composition g f)
 (H1 : injective f) (H2 : injective g) :
 injective h
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -355,6 +365,7 @@ lemma exercise.composition_surjections (H0 : h = composition g f)
 (H1 : surjective f) (H2 : surjective g) :
 surjective h
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -363,6 +374,7 @@ lemma exercise.injective_si_coompo_injective (H0 : h = composition g f)
 (H1 : injective h) : 
 injective f
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -371,6 +383,7 @@ lemma exercise.surjective_si_coompo_surjective (H0 : h = composition g f)
 (H1 : injective h) : 
 surjective g
 :=
+/- dEAduction -/
 begin
     sorry
 end
@@ -381,18 +394,3 @@ end injections_surjections
 end applications
 
 end theorie_des_ensembles
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
