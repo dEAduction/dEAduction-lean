@@ -111,11 +111,8 @@ end
 lemma exercise.inter_distributive_union : A ∪ (B ∩ C)  = (A ∪ B) ∩ (A ∪ C) :=
 /- dEAduction
 PrettyName
-    
-Description
-    
+    L'union est distributive par rapport à l'intersection
 -/
-
 begin
     sorry
 end
@@ -187,27 +184,15 @@ begin
     sorry
 end
 
-lemma exercise.complement_intersection_quelconque  (H : ∀ i, F i = set.compl (E
- i)) : set.compl (set.Inter E) = set.Union F :=
-/- dEAduction
-PrettyName
-    
-Description
-    Le complémentaire d'une intersection quelconque égale l'union des complémentaires    
--/
-begin   
-    sorry
-end
-
-lemma exercise.inclusion_complement : A ⊆ B → set.compl B ⊆ set.compl
- A :=
+lemma exercise.inclusion_complement :
+A ⊆ B → set.compl B ⊆ set.compl A 
+:=
 /- dEAduction
 PrettyName
     Le passage au complémentaire renverse les inclusions
 Description
     Si A est inclus dans B, alors le complémentaire de A contient le complémentaire de B    
 -/
-
 begin
     sorry
 end
@@ -324,7 +309,7 @@ def composition (g₀ : Y → Z) (f₀ : X → Y) := λx:X, g₀ (f₀ x)
 -----------------
 -- DEFINITIONS --
 -----------------
-lemma definition.injective :
+lemma definition.injectivite :
 injective f ↔ ∀ x y : X, (f x = f y → x = y)
 :=
 /- dEAduction -/
@@ -332,7 +317,7 @@ begin
     unfold injective,
 end
 
-lemma definition.surjective :
+lemma definition.surjectivite :
 surjective f ↔ ∀ y : Y, ∃ x : X, f x = y
 :=
 /- dEAduction -/
