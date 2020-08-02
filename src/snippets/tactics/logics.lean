@@ -190,7 +190,7 @@ et d'une propriété Q quelconque donnée par une expression,
 on déduit la propriété "P ou Q"
 Il manque les variantes. Le choix de les incorporer dépend de la façon dont on gère
 la commutativité de "ou". -/
-meta def OUd (nom : parse ident) : parse texpr →  tactic unit
+meta def OU_left (nom : parse ident) : parse texpr →  tactic unit
 | expr2 := do
     expr1 ← get_local nom,
     name ← get_unused_name `H,

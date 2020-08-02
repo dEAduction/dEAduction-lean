@@ -2,8 +2,6 @@ import data.real.basic
 import data.set
 import tactic
 
-
-
 namespace tactic.interactive
 open lean.parser tactic interactive 
 open interactive (loc.ns)
@@ -52,6 +50,7 @@ match e with
 | `(%%p ↔ %%q) := return ("PROP_IFF", [p,q])
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
+| `(false) := return ("PROP_FALSE",[])
 | `(ℕ → %%X) := return ("SEQUENCE", [X])
 | `(%%I → _root_.set %%X) := return ("SET_FAMILY", [I,X])
 | (pi name binder type body) := do let is_arr := is_arrow e,
@@ -74,7 +73,7 @@ match e with
 | `(%%A ∩ %%B) := return ("SET_INTER", [A,B])
 | `(%%A ∪ %%B) := return ("SET_UNION", [A,B])
 | `(set.compl %%A) := return ("SET_COMPLEMENT", [A])
-| `(%%A \ %%B) := return ("SET_SYM_DIFF", [A,B])
+| `(%%A \ %%B) := return ("SET_DIFF", [A,B])
 | `(%%A ⊆ %%B) := return ("PROP_INCLUDED", [A,B])
 | `(%%a ∈ %%A) := return ("PROP_BELONGS", [a,A])
 | `(@set.univ %%X) := return ("SET_UNIVERSE", [X])
@@ -113,7 +112,7 @@ match e with
 | (var nat)       := return ("VAR" ++ open_bra ++ to_string nat ++ closed_bra, []) 
 | (mvar name pretty_name type)        := return ("METAVAR[" ++ to_string pretty_name ++ "]", []) 
 | (elet name_var type_var expr body)        := return ("LET["++ to_string name_var ++"]", [type_var,expr,body]) 
-| (macro liste pas_compris)       := return ("MACRO", []) 
+| (macro list something)       := return ("MACRO", []) 
 | (lam name binder type body)          := return ("lambda[" ++ to_string name ++ "]", [type,body]) 
 end
 
@@ -122,8 +121,8 @@ end
 and provides a string with parentheses reflecting the mathematical object-/
 private meta def analysis_rec : expr →  tactic string 
 | e := 
-do ⟨string, liste_expr⟩ ←  analysis_expr_step(e), 
-    match liste_expr with
+do ⟨string, list_expr⟩ ←  analysis_expr_step(e), 
+    match list_expr with
     -- BEWARE, case of more than three arguments not implemented
     -- replace by a list.map
     |[e1] :=  do 
@@ -161,17 +160,17 @@ meta def analysis_expr : expr →  tactic string
 
 /- print a list of strings reflecting objects in the context  -/
 meta def hypo_analysis : tactic unit :=
-do liste_expr ← local_context,
+do list_expr ← local_context,
     trace "context:",
-    liste_expr.mmap (λ h, analysis_expr h >>= trace),
+    list_expr.mmap (λ h, analysis_expr h >>= trace),
     return ()
 
 
 /- print the list of all targets -/ 
 meta def targets_analysis : tactic unit :=
-do liste_expr ← get_goals,
+do list_expr ← get_goals,
     trace "targets:", 
-    liste_expr.mmap (λ h, analysis_expr h >>= trace),
+    list_expr.mmap (λ h, analysis_expr h >>= trace),
     return ()
 
 

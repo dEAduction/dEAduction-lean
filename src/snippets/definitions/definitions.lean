@@ -2,7 +2,7 @@ import tactic
 import data.real.basic
 import data.set
 import data.set.lattice
-import logics
+import snippets.tactics.logics
 
 
 namespace tactic.interactive
