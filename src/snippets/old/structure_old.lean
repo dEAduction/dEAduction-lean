@@ -2,6 +2,8 @@ import data.real.basic
 import data.set
 import tactic
 
+
+
 namespace tactic.interactive
 open lean.parser tactic interactive 
 open interactive (loc.ns)
@@ -25,21 +27,16 @@ a local constant a that stands for the first bound variable,
 and the body of a with the free variable replaced by a -/
 meta def instanciate (e : expr) : tactic (expr × expr) :=
 match e with
-| (pi pp_name binder type body) := do
---    pp_name ← get_unused_name pp_name,      -- does not do the job
-    trace ("Instantiation name: " ++ to_string pp_name), 
+| (pi pp_name binder type body) := do 
     a ← mk_local' pp_name binder type,
     let inst_body := instantiate_var body a,
     return (a , inst_body)
 | (lam pp_name binder type body) := do 
---    pp_name ← get_unused_name pp_name,
-    trace ("Instantiation name: " ++ to_string pp_name), 
     a ← mk_local' pp_name binder type,
     let inst_body := instantiate_var body a,
     return (a , inst_body)
 | _ := return (e, e)
 end
-
 
 
 
@@ -55,7 +52,6 @@ match e with
 | `(%%p ↔ %%q) := return ("PROP_IFF", [p,q])
 | `(¬ %%p) := return ("PROP_NOT", [p])
 | `(%%p → false)  := return ("PROP_NOT", [p])
-| `(false) := return ("PROP_FALSE",[])
 | `(ℕ → %%X) := return ("SEQUENCE", [X])
 | `(%%I → _root_.set %%X) := return ("SET_FAMILY", [I,X])
 | (pi name binder type body) := do let is_arr := is_arrow e,
@@ -78,7 +74,7 @@ match e with
 | `(%%A ∩ %%B) := return ("SET_INTER", [A,B])
 | `(%%A ∪ %%B) := return ("SET_UNION", [A,B])
 | `(set.compl %%A) := return ("SET_COMPLEMENT", [A])
-| `(%%A \ %%B) := return ("SET_DIFF", [A,B])
+| `(%%A \ %%B) := return ("SET_SYM_DIFF", [A,B])
 | `(%%A ⊆ %%B) := return ("PROP_INCLUDED", [A,B])
 | `(%%a ∈ %%A) := return ("PROP_BELONGS", [a,A])
 | `(@set.univ %%X) := return ("SET_UNIVERSE", [X])
@@ -99,7 +95,13 @@ match e with
 | `(%%a > %%b) := return ("PROP_>", [a,b]) 
 | `(%%a ≥ %%b) := return ("PROP_≥", [a,b]) 
 ------------------------------ Leaves with data ---------------------------
--- | `(%%g ∘ %%f) := return ("COMPOSITION", [g,f])  does not work
+---------------------------- special NUMBERS (cf also below) 
+--| `(0:ℝ) := return ("NUMBER[0]",[])               -- OK, but maybe week information 0 : real
+--| `(0:ℕ) := return ("NUMBER[0]",[])               
+--| `(0:ℤ) := return ("NUMBER[0]",[])               
+--| `(1:ℝ) := return ("NUMBER[1]",[])               
+--| `(1:ℕ) := return ("NUMBER[1]",[])               
+--| `(1:ℤ) := return ("NUMBER[1]",[])               
 | (app fonction argument)   := 
     if is_numeral e
         then return ("NUMBER" ++ open_bra ++ e_joli ++ closed_bra, []) 
@@ -114,14 +116,12 @@ match e with
 | (sort level) := return ("TYPE", [])  
 | (local_const name pretty_name bi type) := return ("LOCAL_CONSTANT" ++ open_bra 
     ++ "name:" ++ to_string pretty_name ++ "/identifier:" ++ to_string name ++ closed_bra, [type]) 
----------------- Other structures -------------
+---------------- Useless for dEAduction ? -------------
 | (var nat)       := return ("VAR" ++ open_bra ++ to_string nat ++ closed_bra, []) 
 | (mvar name pretty_name type)        := return ("METAVAR[" ++ to_string pretty_name ++ "]", []) 
 | (elet name_var type_var expr body)        := return ("LET["++ to_string name_var ++"]", [type_var,expr,body]) 
-| (macro list something)       := return ("MACRO", []) 
-| (lam name binder type body)          := 
-            do (var_, inst_body) ← instanciate e,
-                return ("LAMBDA",[type, var_, inst_body]) 
+| (macro liste pas_compris)       := return ("MACRO", []) 
+| (lam name binder type body)          := return ("lambda[" ++ to_string name ++ "]", [type,body]) 
 end
 
 
@@ -129,8 +129,8 @@ end
 and provides a string with parentheses reflecting the mathematical object-/
 private meta def analysis_rec : expr →  tactic string 
 | e := 
-do ⟨string, list_expr⟩ ←  analysis_expr_step(e), 
-    match list_expr with
+do ⟨string, liste_expr⟩ ←  analysis_expr_step(e), 
+    match liste_expr with
     -- BEWARE, case of more than three arguments not implemented
     -- replace by a list.map
     |[e1] :=  do 
@@ -168,18 +168,56 @@ meta def analysis_expr : expr →  tactic string
 
 /- print a list of strings reflecting objects in the context  -/
 meta def hypo_analysis : tactic unit :=
-do list_expr ← local_context,
+do liste_expr ← local_context,
     trace "context:",
-    list_expr.mmap (λ h, analysis_expr h >>= trace),
+    liste_expr.mmap (λ h, analysis_expr h >>= trace),
     return ()
 
 
 /- print the list of all targets -/ 
 meta def targets_analysis : tactic unit :=
-do list_expr ← get_goals,
+do liste_expr ← get_goals,
     trace "targets:", 
-    list_expr.mmap (λ h, analysis_expr h >>= trace),
+    liste_expr.mmap (λ h, analysis_expr h >>= trace),
     return ()
 
+
+
+---------------------------------------------------------
+--------- NON UTILISES (debuggage) ----------------------------------
+---------------------------------------------------------
+
+
+/- Appelle l'analyse récursive sur le but ou sur une hypothèse. Non utilisé par la suite. -/
+meta def analysis (names : parse ident*) : tactic unit := 
+match names with
+    | [] := do goal ← tactic.target,
+                trace (analysis_rec goal)
+    | [nom] := do expr ← get_local nom,
+                expr_t ←  infer_type expr,
+                expr_tt ← infer_type expr_t,
+                -- la suite différencie selon la sémantique, 
+                -- ie les objets (éléments, ensembles, fonctions)
+                -- vs les propriétés
+                if expr_tt = `(Prop) then  
+                    trace (analysis_rec expr_t)
+                else  do S1 ← (analysis_rec expr), 
+                        S2 ← (analysis_rec expr_t),
+                        --let S2 := to_string expr_t,
+                        let S3 := S1 ++ " : "++ S2,
+                        trace(S3)
+    | _ := skip
+    end
+
+/- Appelle l'analyse en 1 coup sur le but ou sur une hypothèse. Non utilisé par la suite. -/
+meta def analysis1 (names : parse ident*) : tactic unit := 
+match names with
+    | [] := do goal ← tactic.target,
+                trace (analysis_expr_step goal)
+    | [nom] := do expr ← get_local nom,
+                expr_t ←  infer_type expr,
+                trace (analysis_expr_step expr_t)
+    | _ := skip
+    end
 
 end tactic.interactive

@@ -1,7 +1,8 @@
 import tactic
-import structures
 --import structures
-import definitions
+-- dEAduction imports
+import snippets.tactics.structures
+import snippets.definitions.definitions
 
 
 namespace tactic.interactive
@@ -104,16 +105,58 @@ do
     def_nams.mmap (λ h, tactic.trace h),
     return ()
 
+meta def pprint_all_complete_goals : tactic unit :=
+do
+    tactic.trace_state
 
+meta def print_all_complete_goals : tactic unit :=
+do
+  gs ← get_goals,
+  gs.mmap' $ λ g, set_goals [g] >> 
+  local_context >>= mmap (λ h, analyse_expr h >>= trace),
+  return ()
+
+ 
 
 
 end tactic.interactive
+
+variable X : Type
+example {A A' : set X} : (A = A') ↔ ( ∀ x:X, x ∈ A ↔ x ∈ A' ) :=
+begin
+    hypo_analysis,
+    targets_analysis,
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lemma essai3 (P Q : Prop)   :  P ∨ Q → Q ∨ P :=
+begin
+    intro H,
+
+end
+
+
+
 
 
 
 
 ------------ Théorie des ensembles --------------
-namespace theorie_des_ensembles
+%namespace set_theory
 
 variables {X : Type} {Y : Type}
 -- mem_compl_iff
@@ -129,6 +172,14 @@ begin
     print_all_definitions,
     tautology,
 end
+
+lemma essai (X : Type) (P Q : Prop) : P ∧ Q → P :=
+begin
+    hypo_analysis,
+
+end
+
+
 
 lemma definitions.complement {A : set X} {x : X} : x ∈ set.univ \ A ↔ x ∉ A := 
 begin
@@ -172,7 +223,7 @@ end
 
 example (X Y I : Type) (y_1 : Y) (E : I → set X) : ∀ i' : I , ∀ x : E i',  ∀ f : (E i') → Y, f x = y_1 :=
 begin
-    goals_analysis,
+    targets_analysis,
 end
 
 #print set
@@ -188,4 +239,28 @@ end
 example (X : Type) (n : ℕ) (u : ℕ → X): tt :=
 begin
     hypo_analysis
+end
+
+
+
+lemma exercise.union_distributive_inter (P Q R : Prop) : ( P → Q ) ∧ ( R → Q ) :=
+
+begin
+    split, intro HP,
+    rotate, intro HR,
+    print_all_complete_goals,
+
+end
+
+
+
+example : true ∧ ∀ x : ℕ, true :=
+by do 
+  `[refine ⟨_, λ i, _⟩], -- give ourselves two goals with different local contexts
+  trace_state,
+  gs ← get_goals,
+  gs.mmap' $ λ g, set_goals [g] >> local_context >>= trace,
+  set_goals gs,
+  trace_state
+
 end

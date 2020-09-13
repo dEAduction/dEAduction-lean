@@ -1,9 +1,11 @@
--- import data.set
+import data.set
 import tactic
 
 -- dEAduction imports
 import structures2
 import definitions
+
+set_option pp.width 1000
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
@@ -15,7 +17,7 @@ import definitions
 
 local attribute [instance] classical.prop_decidable
 ---------------------------------------------
--- global parameters = implicit variables --
+-- global parameters = iùmplicit variables --
 ---------------------------------------------
 section course
 parameters {X Y Z: Type}
@@ -34,9 +36,6 @@ PrettyName
 ------------------------
 -- COURSE DEFINITIONS --
 ------------------------
-lemma definition.ssi {P Q : Prop} : (P ↔ Q) ↔ (P → Q) ∧ (Q → P) := 
-iff_def
-
 lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
 iff.rfl
 
@@ -147,8 +146,10 @@ namespace complementaire
 -- variables complementaire --
 variables  {A B : set X}
 variables {I : Type} {E F : I → set X}
-notation `∁`A := set.compl A
+-- notation Z `\` A := (@set.compl Z) A
+-- notation A `ᶜ` := set.compl A
 
+#print set.compl
 -----------------
 -- DEFINITIONS --
 -----------------
@@ -161,7 +162,6 @@ by finish
 
 --lemma definition.difference_d_ensembles {A B : set X} {x : X} : x ∈ B \ A ↔ (x ∈ B ∧ x ∉ A) :=
 -- iff.rfl
-
 
 ---------------
 -- EXERCICES --
@@ -189,8 +189,11 @@ begin
     sorry
 end
 
-lemma exercise.complement_union_quelconque :
-set.compl (set.Union (λ i, E i)) = set.Inter (λ i, set.compl (E i)) :=
+open unions_et_intersections
+
+-- set_option pp.all true
+lemma exercise.complement_union_quelconque (x:X) :
+x ∈ set.compl (set.Union (λ i, E i)) ↔ x ∈ set.Inter (λ i, set.compl (E i)) :=
 /- dEAduction
 PrettyName
     Complémentaire d'union II
@@ -198,6 +201,9 @@ Description
     Le complémentaire d'une réunion quelconque égale l'intersection des complémentaires
 -/
 begin
+    split, intro h1,
+    rw unions_et_intersections.definition.intersection_quelconque_ensembles,
+    targets_analysis,
     sorry
 end
 
@@ -215,7 +221,7 @@ begin
     sorry
 end
 
-lemma exercise.inclusion_complement_II :
+lemma exercise.inclusion_complement_II (Φ: set X → set X) (H: Φ = λ A : set X, set.compl A):
 A ⊆ B ↔ set.compl B ⊆ set.compl A
 :=
 /- dEAduction
@@ -268,6 +274,7 @@ variables {I : Type} {E : I → set X} {F : I → set Y}
 lemma definition.image_directe (y : Y) : y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
 /- dEAduction -/
 begin
+    unfold set.image,
     sorry
 end
 
@@ -283,7 +290,9 @@ end
 ---------------
 lemma exercise.image_de_reciproque : f '' (f ⁻¹' B)  ⊆ B :=
 begin
-    sorry
+    intro y,
+    hypo_analysis,
+  sorry
 end
 
 lemma exercise.reciproque_de_image : A ⊆ f ⁻¹' (f '' A) :=
@@ -302,7 +311,6 @@ begin
     sorry
 end
 
-set_option pp.width 100
 lemma exercise.image_reciproque_inter_quelconque :
 (f ⁻¹'  (set.Inter (λ i, F i))) = set.Inter (λ i, f ⁻¹' (F i))
 :=
@@ -310,9 +318,26 @@ lemma exercise.image_reciproque_inter_quelconque :
 PrettyName
 
 -/
+
 begin
+    targets_analysis,
     sorry
 end
+
+example :
+(f ⁻¹'  (set.Inter (λ i, F i))) ⊆ set.Inter (λ i, f ⁻¹' (F i))
+∧ (f ⁻¹'  (set.Inter (λ i, F i))) ⊆ set.Inter (λ i, f ⁻¹' (F i))
+:=
+/- dEAduction
+PrettyName
+
+-/
+
+begin
+    targets_analysis,
+    sorry
+end
+
 
 /- Idem union quelconques -/
 
@@ -369,9 +394,6 @@ def surjective {X Y : Type} (f₀ : X → Y) := ∀ y : Y, ∃ x : X, f₀ x = y
 def composition {X Y Z : Type} (g₀ : Y → Z) (f₀ : X → Y) := λx:X, g₀ (f₀ x)
 def Identite {X : Type} := λ x:X, x
 
-notation g `∘` f := composition g f
-
-
 lemma definition.injectivite :
 injective f ↔ ∀ x y : X, (f x = f y → x = y)
 :=
@@ -387,10 +409,10 @@ begin
 end
 
 lemma definition.composition :
-∀ x:X, composition g f x = g (f x)
+h = composition g f ↔ ∀ x : X, h x = g (f x)
 :=
 begin
-    sorry
+    apply function.funext_iff,
 end
 
 lemma definition.egalite_fonctions (f' : X → Y) :
@@ -426,6 +448,7 @@ end
 lemma exercise.surjective_ssi_inverse_droite : (surjective f) ↔
 ∃ F: Y → X, (composition f F) = Identite :=
 begin
+    targets_analysis,
     sorry
 end
 
@@ -436,11 +459,12 @@ end inverses
 namespace composition
 open applications_II.definitions
 
-lemma exercise.composition_injections
-(H1 : injective (λx:X, f x)) (H2 : injective g) :
-injective (composition g f)
+lemma exercise.composition_injections (H0 : h = composition g f)
+(H1 : injective f) (H2 : injective g) :
+injective h
 :=
 begin
+    hypo_analysis,
     sorry
 end
 
@@ -449,224 +473,132 @@ lemma exercise.composition_surjections
 surjective (composition g f)
 :=
 begin
+    targets_analysis,
+    rw definitions.definition.surjectivite,
+    intro y,
+    have H3 := H2 y,
+    hypo_analysis,
+    targets_analysis,
     sorry
 end
 
-lemma exercise.injective_si_coompo_injective
-(H1 : injective (composition g f)) :
+ 
+
+
+lemma exercise.injective_si_coompo_injective (H0 : h = composition g f)
+(H1 : injective h) :
 injective f
 :=
 begin
     sorry
 end
 
-lemma exercise.surjective_si_coompo_surjective
-(H1 : surjective (composition g f)) :
+lemma exercise.surjective_si_coompo_surjective (H0 : h = composition g f)
+(H1 : surjective h) :
 surjective g
 :=
 begin
-    sorry
+    targets_analysis
 end
 
 end composition
 
 end applications_II
 
------------------------------------
------------------------------------
-namespace exercices_supplementaires
-
--- todo: implémenter
--- differennce_symetrique
--- diff
--- ∃!
-
--- relations : rel d'eq implique classes égales ou disjointes
--- les images réciproques des singletons forment une partition
--- bijective ssi inversible à g et d et inverses coincident
-
-
-
-
-lemma exercise.exercice_ensembles_1
-(A B : set X) :
-A ∩ B = A ∪ B → A = B
-:=
-begin
-    sorry
-end
-
-lemma exercise.exercice_ensembles_2
-(A B C : set X) :
-A ∩ B = A ∩ C ∧ (set.compl A) ∩ B = (set.compl A) ∩ C → B = C
-:=
-begin
-    sorry
-end
-
-
-lemma exercise.exercice_ensembles_3
-(A B C : set X) :
-A ∩ B = A ∩ C ∧ A ∪ B = A ∪ C → B = C
-:=
-begin
-    sorry
-end
-
-lemma exercise.exercice_ensembles_4
-(A B : set X) :
-A ⊆ B ↔ A ∩ B = A
-:=
-begin
-    sorry
-end
-
-lemma exercise.complement_intersection_deux 
-(A B : set X):
-set.compl (A ∩  B) = (set.compl A) ∪ (set.compl B) 
-:=
-begin
-    sorry
-end
-
---def diff {X : Type} (A B : set X) := {x ∈ A | ¬ x ∈ B}
---notation A `\\` B := diff A B
-
-def difference_symetrique {X : Type} (A B : set X) := (B ∪ A) ∪ (A ∩ B) 
-notation A `Δ` B := difference_symetrique A B
-
-lemma definition.difference 
-(A B : set X) (x : X) :
-x ∈ (A \ B) ↔ x ∈ A ∧ x ∉ B
-:=
-begin
-    refl,
-end
-
-
-lemma definition.difference_symetrique 
-(A B : set X) :
-(A Δ B) =  (A ∪ B) \ (A ∩ B)
-:=
-begin
-    sorry
-end
-
-
-lemma exercise.difference_symetrique_1
-(A B : set X) :
-(A Δ B) = (A \ B) ∪ (B \ A)
-:=
-/- dEAduction
-PrettyName
-    Différence symétrique
--/
-begin
-    sorry
-end
-
-
-lemma exercise.difference_symetrique_2
-(A B : set X) :
-(A Δ B) = (B Δ A)
-:=
-begin
-    sorry
-end
-
-
-lemma exercise.difference_symetrique_3
-(A B C : set X) :
-((A Δ B) Δ C) = (A Δ (B Δ C))
-:=
-begin
-    sorry
-end
-
-
-
-notation `∃!` P := exists_unique P
-
-lemma definition.existe_un_unique
-(P : X → Prop) :
-(∃! P) ↔  (∃ x : X, (P x ∧ (∀ x' : X, P x' → x = x')))
-:=
-begin
-    sorry
-end
-
-lemma exercise.difference_symetrique_4 :
-∃! (λE : set X, ∀ A : set X, (A Δ set.univ) = A) :=
-begin
-    sorry
-end
-
-
-lemma exercise.difference_symetrique_5 (A : set X) :
-exists_unique (λA' : set X, (A Δ A') = set.univ)
-:=
-begin
-    sorry
- end
-
-lemma exercise.difference_symetrique_6
-(A B : set X) :
-(A Δ B) = ∅ ↔ A = B
-:=
-begin
-    sorry
-end
-
-
-
-
--- applications
-variable (f: X → Y)
-
-lemma exercise.exercice_applications_1
-(A B : set X) :
-A ⊆ B → f '' A ⊆ f '' B
-:=
-begin
-    sorry
-end
-
-lemma exercise.exercice_applications_2
-(A B : set X) :
-f '' (A ∪ B)  = f '' A ∪ f '' B
-:=
-begin
-    sorry
-end
-
-
-lemma exercise.exercice_factorisation_I
-(g : Y → Z) (h: X → Z) :
-∃ f: X → Y, h = (applications_II.definitions.composition g f) ↔ h '' set.univ ⊆ g '' set.univ
-:=
-begin
-    sorry
-end
-
-
-lemma exercise.exercice_factorisation_II
-(f : X → Y) (h: X → Z) :
-∃ g: Y → Z, h = (applications_II.definitions.composition g f) ↔ (∀ x y, (f x = f y → h x = h y))
-:=
-begin
-    sorry
-end
-
-
-
--- exoset ficall.pdf exos (140 bijections) 141 142 146 
-
-
-
-
-
-end exercices_supplementaires
-
 end theorie_des_ensembles
+
+
+lemma toto (P Q : Prop) (H : P ∧ Q) : P :=
+begin
+    hypo_analysis,
+    analyse_contexte_brut,
+end
+
+
+
+
+/--------------------------  
+Examples for unitary tests 
+---------------------------/
+-- propositional logic
+example
+(P Q R: Prop)
+(H0: P → P)
+(H0 : P ∧ Q  → Q ∧ P)
+(H1 : P ∨ Q  ↔ Q ∨ P)
+(H2: ¬ ¬ P ↔ P)
+(H3: (R ∧ ¬ R → false))
+(H4: false)
+: true
+:=
+begin
+    hypo_analysis
+end
+
+-- set theory
+example
+(X X': Type)
+(f: X → X')
+(A B C: set X)
+(A' B': set X')
+(x: X)
+(H0: x ∈ A)
+(H1a: C = A ∩ B)
+(H1b: C = A ∪ B)
+(H1c: A = set.compl B)
+(H1d: A' = set.compl B')
+(H2: f '' A ⊆ A')
+(H4: A ⊆ f ⁻¹' A')
+(H6: f ⁻¹' (A' ∩ B') = f ⁻¹' A' ∩ f ⁻¹' B')
+(H8: f ⁻¹' (A' ∪ B') = f ⁻¹' A' ∪ f ⁻¹' B')
+
+: true
+:=
+begin
+    hypo_analysis
+end
+
+
+-- set families
+example
+(X I J: Type)
+(A : set X)
+(E: I → set X)
+(F: J → set X)
+(H0: E = (λ i:I, E i))
+(H2a: A = set.Union E)
+(H2b: A = set.Union (λ i:I, E i))
+(H4: A = set.Inter E)
+(H6: (set.Union E ∩ set.Union F) = set.Union (λ k : (I × J), (E k.1) ∩ (F k.2)) )
+
+: true
+:=
+begin
+    hypo_analysis
+end
+
+
+-- applications and quantifiers
+example 
+(X Y Z: Type)
+(f:X → Y) (g: Y → Z)
+(h:X → Z)
+(x:X)
+(y:Y)
+(z:Z)
+(H0: h = theorie_des_ensembles.applications_II.definitions.composition g f)
+(H1: theorie_des_ensembles.applications_II.definitions.injective f)
+(H2: theorie_des_ensembles.applications_II.definitions.surjective g)
+-- (H3: h x = g (f x))
+(H3b: h x = (theorie_des_ensembles.applications_II.definitions.composition g f) x)
+(H4: ∀ x x':X, f x = f x' → x = x')
+(H5: ∃ y:Y, g y = z)
+: true
+:=
+begin
+    hypo_analysis
+end
+
+
 
 end course
