@@ -29,8 +29,6 @@ Author
     Frédéric Le Roux
 Institution
     Université de France
-AvailableMagic
-    NONE
 -/
 
 
@@ -97,7 +95,7 @@ PrettyName
 ------------------------
 lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
 begin
-    exact iff.rfl,
+    exact iff.rfl
 end
 
 lemma definition.egalite_deux_ensembles {A A' : set X} :
@@ -747,6 +745,7 @@ PrettyName
     Surjective si composition surjective
 -/
 begin
+    intro y,
     sorry
 end
 

@@ -7,7 +7,6 @@ import data.real.basic
 -- dEAduction imports
 import structures2
 import compute
-import utils
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
@@ -126,7 +125,7 @@ begin
 end
 
 lemma theorem.negation_non {P : Prop} :
-( not not P ) ↔  P
+( not not P ) ↔  P 
 :=
 /- dEAduction
 PrettyName
@@ -170,7 +169,7 @@ PrettyName
     Négation de '∀x, P(x)'
 -/
 begin
-    exact not_forall
+    exact not_forall    
 end
 
 
@@ -238,6 +237,7 @@ PrettyName
     Plus petit que tous
 -/
 begin
+    targets_analysis,
     sorry
 end
 

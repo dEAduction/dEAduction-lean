@@ -30,7 +30,7 @@ Author
 Institution
     Université de France
 AvailableMagic
-    NONE
+    assumption
 -/
 
 
@@ -765,6 +765,17 @@ lemma exercise.surjective_ssi_inverse_droite : (surjective f) ↔
 /- dEAduction
 PrettyName
     (*) Surjectivité et inverse à droite
+-/
+begin
+    sorry
+end
+
+lemma exercise.surjective_si_compo_avec_injective_est_surjective :
+(surjective (composition g f)) ∧ (injective g) → surjective f
+:=
+/- dEAduction
+PrettyName
+    Surjectivité si compo avec injective donne surjective
 -/
 begin
     sorry

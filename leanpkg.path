@@ -1,7 +1,4 @@
 builtin_path
 path _target/deps/mathlib/src
-path ./src/snippets/definitions
-path ./src/snippets/exercises
-path ./src/snippets/tactics
-path ./src/snippets/test
 path ./src
+path ./src/lean_src

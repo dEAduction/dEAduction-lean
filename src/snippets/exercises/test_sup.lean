@@ -7,7 +7,6 @@ import data.real.basic
 -- dEAduction imports
 import structures2
 import compute
-import utils
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
@@ -49,11 +48,35 @@ AvailableLogic
 -- negation
 -- AvailableExercises is set to None so that no exercise statement can be applied
 -- by the user. Recommended with OpenQuestions set to True!
+universe u
+variable  {α : Sort u}
+variables (p q : Prop)
+variable  (s : α → Prop)
+
+local attribute [instance, priority 10] classical.prop_decidable
+theorem not_not_eq : (¬ ¬ p) = p := propext not_not
+theorem not_and_eq : (¬ (p ∧ q)) = (¬ p ∨ ¬ q) := propext not_and_distrib
+theorem not_or_eq : (¬ (p ∨ q)) = (¬ p ∧ ¬ q) := propext not_or_distrib
+theorem not_forall_eq : (¬ ∀ x, s x) = (∃ x, ¬ s x) := propext not_forall
+theorem not_exists_eq : (¬ ∃ x, s x) = (∀ x, ¬ s x) := propext not_exists
+theorem not_implies_eq : (¬ (p → q)) = (p ∧ ¬ q) := propext not_imp
+
+theorem classical.implies_iff_not_or : (p → q) ↔ (¬ p ∨ q) := imp_iff_not_or
+
+
+theorem not_eq (a b : α) : (¬ a = b) ↔ (a ≠ b) := iff.rfl
+
+variable  {β : Type u}
+variable [linear_order β]
+theorem not_le_eq (a b : β) : (¬ (a ≤ b)) = (b < a) := propext not_le
+theorem not_lt_eq (a b : β) : (¬ (a < b)) = (b ≤ a) := propext not_lt
 
 
 
-
-
+lemma prop_ex {P Q : Prop} : ( ∃ H: P, Q ) ↔ (P ∧ Q) := 
+begin
+    exact exists_prop
+end
 
 
 
@@ -126,7 +149,7 @@ begin
 end
 
 lemma theorem.negation_non {P : Prop} :
-( not not P ) ↔  P
+( not not P ) ↔  P 
 :=
 /- dEAduction
 PrettyName
@@ -150,14 +173,14 @@ end
 
 
 lemma theorem.negation_existe  {X : Sort*} {P : X → Prop} :
-( ( not ∃ (x:X), P x  ) ↔ ∀ x:X, not P x )
+( ( not ∃ (x:X), P x  ) = ∀ x:X, not P x )
 :=
 /- dEAduction
 PrettyName
     Négation de '∃X, P(x)'
 -/
 begin
-    exact not_exists,
+    exact propext not_exists,
 end
 
 
@@ -170,7 +193,7 @@ PrettyName
     Négation de '∀x, P(x)'
 -/
 begin
-    exact not_forall
+    exact not_forall    
 end
 
 
@@ -220,14 +243,19 @@ begin
     sorry
 end
 
-lemma exercise.zero_ou_un_2 : ∀ n:ℕ, (n = 0 or n = 1)
+lemma exercise.zero_ou_un_2 : not ( ∀ n:ℕ, (n = 0 or n = 1) )
 :=
 /- dEAduction
 PrettyName
     Zéro ou un ou ?...
 -/
 begin
-    sorry
+    rw negation.theorem.negation_pour_tout,
+    simp_rw negation.theorem.negation_ou,
+    use 2,
+    split,
+    solve1 {norm_num at *} <|> solve1 {norm_num at *, compute_n 10},
+    solve1 {norm_num at *} <|> solve1 {norm_num at *, compute_n 10},
 end
 
 
@@ -241,17 +269,24 @@ begin
     sorry
 end
 
-
-lemma exercise.vraiment_plus_petit : ∃ m:ℤ,
-∀ n:ℤ,
-m ≤ n
+-- set_option pp.all true
+lemma exercise.vraiment_plus_petit : 
+non( ∃ m:ℤ,
+(∀ n:ℤ,
+m ≤ n) )
 :=
 /- dEAduction
 PrettyName
     Plus petit que tous...
 -/
 begin
-    sorry
+    -- rw not_exists,
+    -- rw negation.theorem.negation_existe,
+    -- simp_rw negation.theorem.negation_pour_tout,
+    -- simp_rw negation.theorem.negation_inegalite_large,
+    -- intro x,
+    -- use x-1,
+    -- compute_n 10,
 end
 
 
@@ -267,27 +302,78 @@ end
 
 
 lemma exercise.egalite_2 :
-∃ m:ℕ, ∀ n:ℕ, m=n
+not (∃ m:ℕ, ∀ n:ℕ, m=n)
 :=
 /- dEAduction
 PrettyName
     Egaux à tous !
 -/
 begin
-    sorry
+    rw negation.theorem.negation_existe,
+    simp_rw negation.theorem.negation_pour_tout,
+    intro x,
+    use x+1,
+    compute_n 10,
+end
+
+
+lemma essai (X : Type) (x: X) (A B C : set X) (H : x ∈ A ∩ B) : x ∈ B ∩ A :=
+begin
+    cases H with H1 H2,
 end
 
 
 lemma exercise.tres_petit :
-∀ a ≥ (0:ℝ), ∀ ε ≥ (0:ℝ), (a ≤ ε → a = 0)
+non (∀ a ≥ (0:ℝ), ∀ ε ≥ (0:ℝ), (a ≤ ε → a = 0) )
 :=
 /- dEAduction
 PrettyName
     Très petit
 -/
 begin
-    sorry
+        conv {whnf },
+    -- rw not_forall_eq,
+    --  simp_rw Logique_et_nombres_reels.negation.theorem.negation_implique,
+    -- simp_rw not_forall_eq,
+    -- targets_analysis,
+    -- use 1,
+    -- split,
+    -- solve1 {norm_num at *},
+    -- use 2,
+    -- rw and.comm, split,
+    -- rw exists_prop, rw and.comm, split,
+    -- compute_n 10,
 end
+
+
+lemma essai.conv1 (X : Type) (x y : X) (P Q : Prop) : (x = y)  ∧ Q :=
+begin
+    conv
+    begin
+        congr,
+    end
+end
+
+
+lemma essai.conv :
+non (∀ a ≥ (0:ℝ), ∀ ε ≥ (0:ℝ), (a ≤ ε → a = 0) )
+:=
+begin
+--    rw not_forall,
+--    conv in (¬ (_ → _)) {skip},
+end
+
+
+
+example : (∀ ε ≥ (0:ℝ), not (1 ≤ ε → 1 = 0)) :=
+begin
+    
+    conv in (not (1 ≤ ε → 1 = 0)) {rw not_implies_eq},
+
+end
+
+
+
 
 
 lemma exercise.tres_petit_2 :
@@ -300,9 +386,35 @@ SimplificationCompute
     $ALL
 -/
 begin
-    sorry
+    intro a, intro H1,
+    intro H2,
+    let x := 0, have H3 : x=0, from rfl,
+    have H7 : (x:ℝ) ≥ (0:ℝ), by { try {norm_num at *}, try {compute_n 10}},
+    -- have H8 := H2 (0:ℕ),
+    -- norm_cast at *,
+    have H9 := H2 _ H7,
+    norm_num at *,
+    compute_n 10,
 end
 
+
+example : 0.5 ≥ 0 and 3>0 :=
+begin
+    split,
+    targets_analysis,
+    solve1 {norm_num at *} <|> solve1 {norm_num at *, compute_n 10},
+    solve1 {norm_num at *} <|> solve1 {norm_num at *, compute_n 10},
+
+end
+
+example (X:Type) (x:X) (A B: set X) (H: A = has_emptyc.emptyc) (H2: x ∈ A)
+:
+false :=
+begin
+    rw H at H2,
+    exfalso,
+    apply set.not_mem_empty _ H2,
+end
 
 
 lemma exercise.tres_petit_3 :
@@ -313,7 +425,24 @@ PrettyName
     Trop compliqué !
 -/
 begin
-    sorry
+    intro x, intro H1,
+    intro H2,
+    by_contradiction H3,
+    have H6: (x/2:ℝ) > 0, rotate, 
+    -- have H7 := H2 (x/2) H6,
+    `[ have H7 := H2 (x/2) H6] <|> `[ have H7 := H2 _ x/2 H6] <|> `[ have H7 := H2 _ _ x/2 H6] <|> `[ have H7 := H2 _ _ _ x/2 H6] <|> `[ have H7 := H2 _ _ _ _ x/2 H6] <|> `[ have H7 := @H2 x/2 H6] <|> `[ have H7 := @H2 _ x/2 H6] <|> `[ have H7 := @H2 _ _ x/2 H6] <|> `[ have H7 := @H2 _ _ _ x/2 H6] <|> `[ have H7 := @H2 _ _ _ _ x/2 H6], rotate, `[ solve1 {try {norm_num at * }, try {compute_n 1 } }] <|> `[ rotate], rotate,
+
+    -- intros x H1 H2,
+    -- by_contradiction,
+    -- let x1 := x/2, have H3 : x1 = x/2, refl,
+    -- have H4 : x1>0, by { try {norm_num at *}, try {compute_n 10}},
+    -- -- have H8 := H2 (0:ℕ),
+    -- -- norm_cast at *,
+    -- have H9 := H2 _ H4,
+    -- rw H3 at H9,
+    -- norm_num at *,
+    -- compute_n 10,
+    -- solve1 {norm_num at *} <|> solve1 {norm_num at *, compute_n 10},
 end
 
 
@@ -325,7 +454,7 @@ PrettyName
     Entre deux entiers
 -/
 begin
-    sorry
+    sorry,
 end
 
 
@@ -337,7 +466,40 @@ PrettyName
     Entre deux réels
 -/
 begin
-    sorry
+    admit,
+end
+
+
+lemma exercise.essai_qqs (x y x' y' : ℝ) (H1 : x>1) (H2: y ≥ 56) (P: ℝ → ℝ → Prop)
+(H3: ∀ x>(0:ℝ), ∀ y>(0:ℝ), P x y) : P x y
+-- ∀ x>(0:ℝ), ∀ y>(0:ℝ), x*y >0
+:=
+begin
+--    have h1: x>0, rotate,
+--    have h2: y>0, rotate,
+--    have h3 := H3 x h1 y h2, rotate,
+--    iterate 2 { focus {try {norm_num at *}, compute_n 10} <|> rotate}, rotate,
+
+end
+
+lemma ex1 (X: Type) (x: X) (P Q : X → Prop) (H1: ∀ x, P x → Q x) (H2: P x):
+Q x
+:=
+begin
+    apply H1,
+end
+
+
+lemma ex2 (X Y: Type)(f: X → Y) (H: ∀ x x':X,  x = x') : true
+:=
+begin
+    have h := congr_arg f (H _ _),
+end
+
+lemma ex3 (X: Type)  (x: X) (A B : set X) (H: x ∉ A ∪ B) : true
+:=
+begin
+    push_neg at H,
 end
 
 end exercices
