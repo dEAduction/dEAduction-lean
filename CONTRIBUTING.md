@@ -39,7 +39,7 @@ end
 ```
 You might skip the first instance if you use the continuity definition from the mathematical library of Lean instead of redifining it.
 
-## Structure of a Lean file suitable for dEAduction.
+## Structure of a Lean file suitable for dEAduction
 ### Statements
 The main ingredients of the file are definitions, theorems, and exercises.
 Every definition should be stated as an "iff" lemma, e.g.
