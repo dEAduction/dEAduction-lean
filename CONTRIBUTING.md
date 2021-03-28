@@ -1,6 +1,6 @@
 # CONTRIBUTING
 
-## Making your own exercises: overview
+## Making your own exercises: an overview
 dEAduction is designed so that everyone can create its own exercises sheet. Designing a new exercise sheet consists in creating a Lean file
 that dEAduction will be able to parse. The dEAduction format of Lean's files is described in [this other page](https://github.com/dEAduction/dEAduction/wiki/d%E2%88%83%E2%88%80duction-format-for-Lean-files).
 Here we just give an overview of the creation of new files. Roughly speaking, there two different situations. 
