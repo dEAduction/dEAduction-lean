@@ -21,7 +21,23 @@ First you define the property `continuous f` in your Lean file. But dEAduction w
 we will have to add a few lines to some specific file in the Python part of dEAduction (in a file called `display_data.py`).
 You can do this by yourself and make a pull request (see the [CONTRIBUTING](https://github.com/dEAduction/dEAduction/blob/master/CONTRIBUTING.md)),
 or ask someone in the dEAduction team if he can help. For this you might consider using [issues](https://github.com/dEAduction/dEAduction/issues).
-Note that dEAduction's users will not have access to your definition until you put it in the Lean file in the shape of a "definition" lemma, see below.
+
+Note that dEAduction's users will not have access to your definition until you put it in the Lean file in the shape of a "definition" lemma. So your continuity definition will appear twice: the first instance is for Lean's usage, like in
+```
+def continuous (f : X → Y) :=
+  ∀ x₀ : X, ∀ ε > 0, ∃ δ > 0, ∀ x, d_[X] x₀ x < δ → d_[Y] (f x₀) (f x) < ε   
+```
+And the second time to make it available for dEAduction's user, like in
+```
+lemma definition.continuity
+(f : X → Y) :
+(continuous f) ↔ ( ∀ x₀ : X, ∀ ε > 0, ∃ δ > 0, ∀ x, d_[X] x₀ x < δ → d_[Y] (f x₀) (f x) < ε )
+:=
+begin
+    sorry
+end
+```
+You might skip the first instance if you use the continuity definition from the mathematical library of Lean instead of redifining it.
 
 ## Structure of a Lean file suitable for dEAduction.
 ### Statements
