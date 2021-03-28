@@ -21,6 +21,7 @@ First you define the property `continuous f` in your Lean file. But dEAduction w
 we will have to add a few lines to some specific file in the Python part of dEAduction (in a file called `display_data.py`).
 You can do this by yourself and make a pull request (see the [CONTRIBUTING](https://github.com/dEAduction/dEAduction/blob/master/CONTRIBUTING.md)),
 or ask someone in the dEAduction team if he can help. For this you might consider using [issues](https://github.com/dEAduction/dEAduction/issues).
+Note that dEAduction's users will not have access to your definition until you put it in the Lean file in the shape of a "definition" lemma, see below.
 
 ## Structure of a Lean file suitable for dEAduction.
 ### Statements
