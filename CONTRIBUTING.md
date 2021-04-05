@@ -106,6 +106,7 @@ local attribute [instance] classical.prop_decidable
 -- NB: this is a technical line (allow the use of classical logic).
 
 section course
+parameters {X : Type}
 open set -- Open the `set`spacename to allow easy access to the instructions.
 ------------------
 -- COURSE TITLE --
