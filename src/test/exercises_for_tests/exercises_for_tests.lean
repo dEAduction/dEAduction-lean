@@ -4,7 +4,6 @@ import tactic
 -- dEAduction imports
 import structures2
 import notations_definitions
-import utils
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
@@ -17,29 +16,41 @@ import utils
 ---------------------
 -- logic names ['and', 'or', 'negate', 'implicate', 'iff', 'forall', 'exists']
 -- proofs names ['use_proof_methods', 'new_object', 'apply', 'assumption']
--- magic names ['compute']
+-- TODO: add 'compute'
 -- proof methods names ['cbr', 'contrapose', 'absurdum', 'sorry']
 
+
+/- MACROS
+user macros must start with '$',    e.g.:
+$FAMILY_STATEMENT
+    union_quelconque_ensembles intersection_quelconque_ensembles
+                                    and then:
+AvailableDefinitions
+    $UNTIL_NOW -$FAMILY_STATEMENT
+-/
 
 
 /- dEAduction
 Title
-    Théorie des ensembles
+    Exercises for unitary test
 Author
     Frédéric Le Roux
 Institution
     Université de France
+DefaultAvailableProof
+    $ALL
+$FAMILY_STATEMENT
+    union_quelconque_ensembles intersection_quelconque_ensembles
 -/
 
 
 local attribute [instance] classical.prop_decidable
 
-
 ---------------------------------------------
 -- global parameters = implicit variables --
 ---------------------------------------------
 section course
--- parameters {X Y Z: Type}
+parameters {X Y Z: Type}
 
 notation [parsing_only] P ` and ` Q := P ∧ Q
 notation [parsing_only]  P ` or ` Q := P ∨ Q
@@ -67,7 +78,6 @@ notation [parsing_only]  A ` union ` B := A ∪ B
 notation [parsing_only]  A ` inclus ` B := A ⊆ B
 notation [parsing_only]  `vide` := ∅
 
-
 notation f `⟮` A `⟯` := f '' A
 notation f `⁻¹⟮` A `⟯` := f  ⁻¹' A
 notation [parsing_only] f `inverse` A := f  ⁻¹' A
@@ -75,7 +85,7 @@ notation g `∘` f := set.composition g f
 notation `∃!` P := exists_unique P
 
 open set
-parameters X Y Z: Type
+
 ------------------
 -- COURSE TITLE --
 ------------------
@@ -117,27 +127,6 @@ begin
     exact eq_empty_iff_forall_not_mem,
 end
 
--- lemma definition.ensemble_non_vide
--- (A: set X) :
--- (A ≠ ∅) ↔ ∃ x : X, x ∈ A
--- :=
--- begin
---     sorry
--- end
-
--- set_option pp.all true
-lemma definition.ensemble_extension {X: Type}  {P : X → Prop} {x:X} :
- x ∈ {x | P x} ↔ P x
-:=
-/- dEAduction
-PrettyName
-    Ensemble en extension
--/
-begin
-    refl
-end
-
-
 lemma theorem.double_inclusion (A A' : set X) :
 (A ⊆ A' ∧ A' ⊆ A) → A = A' :=
 /- dEAduction
@@ -155,30 +144,15 @@ lemma exercise.inclusion_transitive
 /- dEAduction
 PrettyName
     Transitivité de l'inclusion
-AutoTest
-    →, definition.inclusion, ∀, →,
-    @P1 ∧,
-    @P2 @P3 definition.inclusion,
-    @P2 @P1 →,
-    @P3 @P4 →,
-    CQFD
+AvailableLogic
+    $ALL -iff -exists -negate
+AvailableProof
+    $ALL -use_proof_methods -new_object
 -/
 begin
-    intro H1,
-    rw definition.inclusion,
-    intros x H2,
-    cases H1 with H3 H4,
-    rw definition.inclusion at H3 H4,
-    have H5 := H3 H2,
-    have H6 := H4 H5,
-    assumption,
+    sorry
 end
 
-example (x y:X) (H : x ≠ y) : y ≠ x :=  
-begin
-    apply ne.symm, assumption,
-end
- 
 
 end generalites
 
@@ -251,10 +225,8 @@ A ∩ B ⊆ A
 /- dEAduction
 PrettyName
     Un ensemble contient son intersection avec un autre
-AutoTest
-    definition.inclusion,  ∀, →, 
-    @P1 definition.intersection_deux_ensembles, @P1 ∧,
-    CQFD
+AvailableDefinitions
+    $UNTIL_NOW -$FAMILY_STATEMENT
 -/
 begin
     sorry
@@ -267,14 +239,8 @@ PrettyName
     Intersection avec une union
 Description
     L'intersection est distributive par rapport à l'union
-AvailableLogic
-    $ALL
-AvailableProofs
-    $ALL
 AvailableDefinitions
-    $UNTIL_NOW -union_quelconque_ensembles -intersection_quelconque_ensembles
-AvailableTheorems
-    double_inclusion
+    $UNTIL_NOW -$FAMILY_STATEMENT
 ExpectedVarsNumber
     X=3, A=1, B=1
 -/
@@ -340,7 +306,7 @@ PrettyName
 Description
     Tout ensemble est égal au complémentaire de son complémentaire
 AvailableDefinitions
-    $UNTIL_NOW -union_quelconque_ensembles -intersection_quelconque_ensembles
+    $UNTIL_NOW -$FAMILY_STATEMENT
 -/
 begin
     sorry
@@ -405,51 +371,11 @@ end complementaire
 
 
 
--- Ajouter :  4. relations ?
-
-namespace produits_cartesiens
-/- dEAduction
-PrettyName
-    Produits cartésiens
--/
+-- Ajouter : 3. produit cartésien, 4. relations ?
+-- comment définit-on un produit cartésien d'ensembles ?
 
 
--- Peut-on en faire une définition ?
-lemma theorem.type_produit :
-∀ z:X × Y, ∃ x:X, ∃ y:Y, z = (x,y)
-:=
-/- dEAduction
-PrettyName
-    Element d'un produit cartésien de deux ensembles
--/
-begin
-    sorry
-end
 
-
-lemma definition.produit_de_parties {A : set X} {B : set Y}
-{x:X} {y:Y} :
-(x,y) ∈ set.prod A B ↔ x ∈ A ∧ y ∈ B
-:=
-/- dEAduction
-PrettyName
-    Produit cartésien de deux parties
--/
-begin
-    sorry
-end
-
-
-lemma exercise.produit_avec_intersection
-(A : set X) (B C : set Y) :
-set.prod A (B ∩ C) = (set.prod A B) ∩ (set.prod A C)
-:=
-begin
-    sorry
-end
-
-
-end produits_cartesiens
 ---------------
 -- SECTION 3 --
 ---------------
@@ -490,8 +416,8 @@ begin
     sorry
 end
 
-lemma definition.composition {x:X}:
-composition g f x = g (f x)
+lemma definition.composition :
+∀ x:X, composition g f x = g (f x)
 :=
 begin
     sorry,
@@ -770,7 +696,6 @@ PrettyName
     Surjective si composition surjective
 -/
 begin
-    intro y,
     sorry
 end
 
@@ -800,7 +725,7 @@ lemma exercise.bijective_ssi_injective_et_surjective :
 :=
 /- dEAduction
 PrettyName
-    (**) "Bijectif" équivaut à "injectif et surjectif"
+    (+) "Bijectif" équivaut à "injectif et surjectif"
 -/
 begin
     sorry
@@ -812,7 +737,7 @@ composition g f = Identite ∧ composition f g  = Identite
 :=
 /- dEAduction
 PrettyName
-    (**) Bijectivité et existence d'une application réciproque
+    (+) Bijectivité et existence d'une application réciproque
 -/
 begin
     sorry
@@ -830,40 +755,17 @@ begin
     sorry
 end
 
-
-
-
-lemma exercise.Cantor (f : X → set X):
- ¬ surjective f
+lemma exercise.Cantor :
+∀ f : X → set X, ¬ surjective f
 :=
 /- dEAduction
 PrettyName
     (+) Théorème de Cantor : il n'y a pas de surjection d'un ensemble vers l'ensemble de ses parties
 -/
 begin
-    by_contradiction H14,
-    let A := {x | x ∉ f x}, have H15 : A = {x | x ∉ f x}, refl,
-    rw theorie_des_ensembles.applications_II.definitions.definition.surjectivite at H14,
-    have H16 := H14 A,
-    cases H16 with x H17,
-    cases (classical.em (x dans A)) with H22 H23,
-    {
-        have H22b: x ∉ A,
-        rw H15 at H22,
-        rw generalites.definition.ensemble_extension at H22,
-        rw H17, assumption,
-        contradiction,
-    },
-    {
-        have H22b: x ∈ A,
-        rw H15 at H23,
-        -- simp only[ensemble_extension] at H23,
-        rw generalites.definition.ensemble_extension at H23,
-        push_neg at H23,
-        rw H17, assumption,
-        contradiction
-    }
+    sorry
 end
+
 
 
 end exercices

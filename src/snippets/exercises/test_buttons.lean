@@ -5,6 +5,7 @@ import tactic
 import structures2
 import notations_definitions
 import utils
+
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
 -- other parameters are implicit in definitions, i.e. defined using '{}' (e.g. {A : set X} )
@@ -16,12 +17,14 @@ import utils
 ---------------------
 -- logic names ['and', 'or', 'negate', 'implicate', 'iff', 'forall', 'exists']
 -- proofs names ['use_proof_methods', 'new_object', 'apply', 'assumption']
--- TODO: add 'compute'
+-- magic names ['compute']
 -- proof methods names ['cbr', 'contrapose', 'absurdum', 'sorry']
 
 
 
 /- dEAduction
+Title
+    Théorie des ensembles
 Author
     Frédéric Le Roux
 Institution
@@ -36,7 +39,7 @@ local attribute [instance] classical.prop_decidable
 -- global parameters = implicit variables --
 ---------------------------------------------
 section course
-parameters {X Y Z: Type}
+-- parameters {X Y Z: Type}
 
 notation [parsing_only] P ` and ` Q := P ∧ Q
 notation [parsing_only]  P ` or ` Q := P ∨ Q
@@ -49,6 +52,7 @@ notation [parsing_only]  A ` cap ` B := A ∩ B
 notation [parsing_only]  A ` cup ` B := A ∪ B
 notation [parsing_only]  A ` subset ` B := A ⊆ B
 notation [parsing_only]  `emptyset` := ∅
+notation [parsing_only]  `vide` := ∅
 
 notation [parsing_only] P ` et ` Q := P ∧ Q
 notation [parsing_only]  P ` ou ` Q := P ∨ Q
@@ -62,7 +66,7 @@ notation [parsing_only]  A ` inter ` B := A ∩ B
 notation [parsing_only]  A ` intersection ` B := A ∩ B
 notation [parsing_only]  A ` union ` B := A ∪ B
 notation [parsing_only]  A ` inclus ` B := A ⊆ B
-notation [parsing_only]  `vide` := ∅
+
 
 notation f `⟮` A `⟯` := f '' A
 notation f `⁻¹⟮` A `⟯` := f  ⁻¹' A
@@ -71,7 +75,7 @@ notation g `∘` f := set.composition g f
 notation `∃!` P := exists_unique P
 
 open set
-
+parameters X Y Z: Type
 ------------------
 -- COURSE TITLE --
 ------------------
@@ -105,12 +109,6 @@ begin
      exact set.ext_iff
 end
 
-
-example (A: set X) (x:X) (H1: x ∈ A) (H2: x ∉ A) : false :=
-begin
-    contradiction,
-end
-
 lemma definition.ensemble_vide
 (A: set X) :
 (A = ∅) ↔ ∀ x : X, x ∉ A
@@ -127,32 +125,17 @@ end
 --     sorry
 -- end
 
-lemma definition.ensemble_extension {X: Type}  {P : X → Prop} :
-∀{x:X}, x ∈ {x | P x} ↔ P x
+-- set_option pp.all true
+lemma definition.ensemble_extension {X: Type}  {P : X → Prop} {x:X} :
+ x ∈ {x | P x} ↔ P x
 :=
 /- dEAduction
 PrettyName
     Ensemble en extension
 -/
 begin
-    intro x,
     refl
 end
-
-
-lemma essai_CQFD_1 (A: set X) (x:X) (H1: x ∈ A) (H2: A = ∅) : false :=
-begin
-    -- exact eq_empty_iff_forall_not_mem.mp H2 x H1,
-    rw H2 at H1,
-    exact not_mem_empty _ H1,
-end
-
-lemma essai.CQFD_2 (f: X → Y) (a b c:X) (H1: a=b) (H2: b=c) : f a= f c :=
-begin
-    -- have H3: a=c, by transitivity b ; assumption,
-    cc,
-end
-
 
 
 lemma theorem.double_inclusion (A A' : set X) :
@@ -172,13 +155,528 @@ lemma exercise.inclusion_transitive
 /- dEAduction
 PrettyName
     Transitivité de l'inclusion
+AutoTest
+    →, definition.inclusion, ∀, →,
+    @P1 ∧,
+    @P2 @P3 definition.inclusion,
+    @P2 @P1 →,
+    @P3 @P4 →,
+    CQFD
+-/
+begin
+    intro H1,
+    rw definition.inclusion,
+    intros x H2,
+    cases H1 with H3 H4,
+    rw definition.inclusion at H3 H4,
+    have H5 := H3 H2,
+    have H6 := H4 H5,
+    assumption,
+end
+
+example (x y:X) (H : x ≠ y) : y ≠ x :=  
+begin
+    apply ne.symm, assumption,
+end
+ 
+end generalites
+
+
+namespace tests_statements
+
+
+lemma exercise.test_definition
+(A B : set X)  (H1: A ⊆ B) :
+A ⊆ B 
+:=
+/- dEAduction
+AutoTest
+    H1 definition.inclusion,
+    definition.inclusion,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_theorem_target
+(A A' : set X) (H1: (A ⊆ A' ∧ A' ⊆ A)): 
+A = A' 
+:=
+/- dEAduction
+AutoTest
+    theorem.double_inclusion,
+    CQFD
+-/
+begin
+  sorry
+end
+
+
+lemma exercise.test_theorem_hypo
+(A A' : set X) (H1: (A ⊆ A' ∧ A' ⊆ A)): 
+A = A' 
+:=
+/- dEAduction
+AutoTest
+    H1 theorem.double_inclusion,
+    CQFD
+-/
+begin
+  sorry
+end
+end tests_statements
+
+---------------------------
+--- TESTS LOGIC BUTTONS ---
+---------------------------
+namespace tests_logic_buttons
+
+-----------
+--- AND ---
+-----------
+namespace tests_and
+lemma exercise.test_construct_and_left
+(P Q : Prop) (H1: P) (H2 : Q) : P ∧ Q :=
+/- dEAduction
+AutoTest
+    ∧ 0, CQFD, CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_and_right
+(P Q : Prop) (H1: P) (H2 : Q) :
+P ∧ Q :=
+/- dEAduction
+AutoTest
+    ∧ 1, CQFD, CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_and
+(P Q : Prop) (H1: P ∧ Q):
+P :=
+/- dEAduction
+AutoTest
+    H1 ∧,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_and_hyp
+(P Q : Prop)  (H1: P) (H2 : Q):
+P ∧ Q :=
+/- dEAduction
+AutoTest
+    @P1 @P2 ∧, CQFD
+-/
+begin
+  sorry,
+end
+end tests_and
+
+----------
+--- OR ---
+----------
+namespace test_or
+
+lemma exercise.test_construct_or_right
+(P Q : Prop) (H1: P) : P ∨ Q :=
+/- dEAduction
+AutoTest
+    ∨ 0,
+    CQFD,
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_or_left
+(P Q : Prop) (H1: Q) : P ∨ Q :=
+/- dEAduction
+AutoTest
+    ∨ 1,
+    CQFD,
+-/
+begin
+  sorry
+end
+
+
+lemma exercise.test_apply_or_left
+(P Q : Prop) (H1: P ∨ Q):
+P ∨ Q :=
+/- dEAduction
+AutoTest
+    H1 ∨ 0,
+    ∨ 0,
+    CQFD,
+    ∨ 1,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_or_right
+(P Q : Prop) (H1: P ∨ Q) : P ∨ Q :=
+/- dEAduction
+AutoTest
+    H1 ∨ 1,
+    ∨ 1,
+    CQFD,
+    ∨ 0,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_or_on_hyp_left
+(P Q : Prop) (H1: P):
+P ∨ Q :=
+/- dEAduction
+AutoTest
+    H1 ∨ Q 0,
+    CQFD,
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_or_on_hyp_right
+(P Q : Prop) (H1: Q):
+P ∨ Q :=
+/- dEAduction
+AutoTest
+    H1 ∨ P 1,
+    CQFD,
+-/
+begin
+  sorry
+end
+
+end test_or
+
+-----------
+--- NOT ---
+-----------
+namespace test_not
+
+lemma exercise.test_action_negate_hyp
+(X: Type) (P Q : X × X → Prop)
+(H1: ¬ (∀ x:X, ∃ y:X, P(x,y) ∨ Q(x,y)) ):
+∃ x:X, ∀ y:X, ¬ P(x,y) ∧ ¬ Q(x,y) :=
+/- dEAduction
+AutoTest
+    H1 ¬, 
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_action_negate_target
+(X: Type) (P Q : X × X → Prop)
+(H1: ∀ x:X, ∃ y:X, P(x,y) ∨ Q(x,y) ):
+¬ (∃ x:X, ∀ y:X, ¬ P(x,y) ∧ ¬ Q(x,y))
+ :=
+/- dEAduction
+AutoTest
+    ¬,
+    CQFD
+-/
+begin
+  sorry
+end
+
+end test_not
+
+-----------------
+--- IMPLICATE ---
+-----------------
+namespace test_implicate
+
+lemma exercise.test_construct_implicate
+(P Q : Prop) (H1: Q) :
+P → Q :=
+/- dEAduction
+AutoTest
+    →,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_implicate
+(P Q : Prop) (H1: P) (H2: P → Q) :
+Q :=
+/- dEAduction
+AutoTest
+    H2 →,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_implicate_to_hyp
+(P Q : Prop) (H1: P) (H2: P → Q) :
+Q :=
+/- dEAduction
+AutoTest
+    H1 H2 →,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_implicate_to_hyp_2
+(X: Type) (P Q: X × X → Prop) (x y: X)
+(H1: P(x,y)) (H2: ∀ x y:X, P(x,y) → Q(x,y)) :
+Q(x,y) :=
+/- dEAduction
+AutoTest
+    H1 H2 →,
+    CQFD
+-/
+begin
+  sorry
+end
+end test_implicate
+
+-----------
+--- IFF ---
+-----------
+namespace test_iff
+
+lemma exercise.test_construct_iff_left
+(P Q : Prop) (H1: P → Q) (H2: Q → P):
+P ↔ Q
+:=
+/- dEAduction
+AutoTest
+    ↔ 0, CQFD, CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_iff_right
+(P Q : Prop) (H1: P → Q) (H2: Q → P):
+P ↔ Q
+:=
+/- dEAduction
+AutoTest
+    ↔ 1, CQFD, CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_destruct_iff
+(P Q : Prop)  (H1: P ↔ Q):
+(P → Q) ∧ (Q → P)
+:=
+/- dEAduction
+AutoTest
+    ↔, CQFD
+-/
+begin
+  sorry,
+end
+
+lemma exercise.test_destruct_iff_on_hyp
+(P Q : Prop) (H1: P ↔ Q):
+(P → Q) ∧ (Q → P)
+:=
+/- dEAduction
+AutoTest
+    H1 ↔, CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_iff_on_hyp
+(P Q : Prop) (H1: P → Q) (H2: Q → P):
+P ↔ Q 
+:=
+/- dEAduction
+AutoTest
+    H1 H2 ↔, CQFD
+-/
+begin
+  sorry
+end
+
+end test_iff
+
+--------------
+--- FORALL ---
+--------------
+namespace test_forall
+
+lemma exercise.test_construct_and_apply_forall
+(X: Type) (P: X → Prop)
+(H1: ∀ x:X, P(x)) :
+∀ x:X, P(x) :=
+/- dEAduction
+AutoTest
+    ∀,
+    @O3 @P1 ∀,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_forall_to_hyp
+(X: Type) (P Q: X × X → Prop) (x y: X)
+(H1: P(x,y)) (H2: ∀ x y:X, P(x,y) → Q(x,y)) :
+Q(x,y) :=
+/- dEAduction
+AutoTest
+    @O4 @O5 H1 H2 ∀,
+    CQFD
+-/
+begin
+  sorry
+end
+end test_forall
+
+
+--------------
+--- EXISTS ---
+--------------
+namespace test_exists
+
+lemma exercise.test_construct_exists
+(X: Type) (P: X → Prop) (z: X)
+(H1: P(z)) :
+∃ x:X, P(x) :=
+/- dEAduction
+AutoTest
+    @O3 ∃,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_construct_exists_2
+(X: Type) (P: X → Prop) (z: X)
+(H1: P(z)) :
+∃ x:X, P(x) :=
+/- dEAduction
+AutoTest
+    ∃ z,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_exists_and_construct_exists_on_hyp
+(X: Type) (P Q: X → Prop)
+(H1: ∃ x:X, P(x))
+(H2: ∀x:X, P(x) → Q(x)) :
+(∃ x:X, Q(x))
+ :=
+/- dEAduction
+AutoTest
+    H1 ∃,
+    @P2 H2 →,
+    @O4 @P3 ∃,
+    CQFD
+-/
+begin
+  sorry
+end
+/- The following exo does not work. Pb= 
+∃ x ∈ A, P(x)
+as a target is actually 
+∃ x:X, ∃ H:x ∈ A, P(x)
+whereas in deaduction's hypo it is
+∃ x:X, x ∈ A ∧ P(x).
+Deaduction display all this the same way but assumption fails!
+-/
+-- lemma exercise.test_apply_exists_2
+-- (X: Type) (A: set X) (P Q: X → Prop)
+-- (H1: ∃ x ∈ A, P(x))
+-- (H2: ∀x∈A, P(x) → Q(x)) :
+-- (∃ x ∈ A, Q(x))
+--  :=
+/- deaduc
+AutoTest
+    H1 ∃,
+    @P1 H2 →,
+    @P3 @P4 ∧,
+    @O5 @P5 ∃,
+    CQFD
+-/
+
+end test_exists
+end tests_logic_buttons
+
+
+---------------------------
+--- TESTS PROOF BUTTONS ---
+---------------------------
+namespace tests_proof_buttons
+
+-- Case base reasoning --
+
+lemma exercise.test_case_base_reasoning
+(P: Prop):
+P ∨ ¬ P :=
+/- dEAduction
+AutoTest
+    proof_methods 0 P,
+    ∨ 0, CQFD,
+    ∨ 1, CQFD
 -/
 begin
     sorry
 end
 
 
-end generalites
+
+
+
+
+
+
+
+end tests_proof_buttons
+
+
+---------------------------
+--- TESTS MAGIC BUTTONS ---
+---------------------------
+namespace tests_magic_buttons
+
+
+
+
+
+
+
+
+
+
+
+
+
+end tests_magic_buttons
 
 ---------------
 -- SECTION 1 --
@@ -249,6 +747,10 @@ A ∩ B ⊆ A
 /- dEAduction
 PrettyName
     Un ensemble contient son intersection avec un autre
+AutoTest
+    definition.inclusion,  ∀, →, 
+    @P1 definition.intersection_deux_ensembles, @P1 ∧,
+    CQFD
 -/
 begin
     sorry
@@ -273,14 +775,7 @@ ExpectedVarsNumber
     X=3, A=1, B=1
 -/
 begin
-    -- {apply generalites.exercise.inclusion_transitive, no_meta_vars},
-    -- apply generalites.theorem.double_inclusion, no_meta_vars,
-    -- have h := @generalites.theorem.double_inclusion,
-    -- `[  <|> `[ simp_rw theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : simp_rw theorie_des_ensembles.generalites.exercise.inclusion_transitive"], no_meta_vars <|> `[ rw <- theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : rw <- theorie_des_ensembles.generalites.exercise.inclusion_transitive"], no_meta_vars <|> `[ simp_rw <- theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : simp_rw <- theorie_des_ensembles.generalites.exercise.inclusion_transitive"], no_meta_vars <|> `[ apply theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : apply theorie_des_ensembles.generalites.exercise.inclusion_transitive"], no_meta_vars <|> `[ have H3 := @theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : have H3 := @theorie_des_ensembles.generalites.exercise.inclusion_transitive"], no_meta_vars,
-    -- {rw theorie_des_ensembles.generalites.exercise.inclusion_transitive, trace "EFFECTIVE CODE 4 : rw theorie_des_ensembles.generalites.exercise.inclusion_transitive", no_meta_vars}
-    -- <|> {apply theorie_des_ensembles.generalites.exercise.inclusion_transitive, no_meta_vars}
-    -- <|> {have H3 := @theorie_des_ensembles.generalites.exercise.inclusion_transitive, no_meta_vars}
-
+    sorry
 end
 
 -- NB: 'ExpectedVarsNumber' is not implemented yet
@@ -297,20 +792,7 @@ AvailableDefinitions
     $UNTIL_NOW -union_quelconque_ensembles -intersection_quelconque_ensembles
 -/
 begin
-    `[rw theorie_des_ensembles.generalites.definition.egalite_deux_ensembles, 
-trace "EFFECTIVE CODE 1 : rw theorie_des_ensembles.generalites.definition.egalite_deux_ensembles"]
-<|> 
-`[simp_rw theorie_des_ensembles.generalites.definition.egalite_deux_ensembles, 
-trace "EFFECTIVE CODE 1 : simp_rw theorie_des_ensembles.generalites.definition.egalite_deux_ensembles"]
-<|> 
-`[rw <- theorie_des_ensembles.generalites.definition.egalite_deux_ensembles, 
-trace "EFFECTIVE CODE 1 : rw <- theorie_des_ensembles.generalites.definition.egalite_deux_ensembles"]
-<|> 
-`[simp_rw <- theorie_des_ensembles.generalites.definition.egalite_deux_ensembles, 
-trace "EFFECTIVE CODE 1 : simp_rw <- theorie_des_ensembles.generalites.definition.egalite_deux_ensembles"],
-have H1 := @exercise.intersection_inclus_ensemble,
-have H2 := @H1 _ A B,
-
+    sorry
 end
 
 
@@ -419,8 +901,7 @@ end complementaire
 
 
 
--- Ajouter : 3. produit cartésien, 4. relations ?
--- comment définit-on un produit cartésien d'ensembles ?
+-- Ajouter :  4. relations ?
 
 namespace produits_cartesiens
 /- dEAduction
@@ -428,8 +909,10 @@ PrettyName
     Produits cartésiens
 -/
 
-lemma definition.type_produit :
-∀ z:X × Y, ∃ x:X, ∃ y:Y, z = (x,y)  
+
+-- Peut-on en faire une définition ?
+lemma theorem.type_produit :
+∀ z:X × Y, ∃ x:X, ∃ y:Y, z = (x,y)
 :=
 /- dEAduction
 PrettyName
@@ -440,8 +923,9 @@ begin
 end
 
 
-lemma definition.produit_de_parties (A : set X) (B : set Y) :
-∀ x:X, ∀ y:Y, (x,y) ∈ set.prod A B ↔ x ∈ A ∧ y ∈ B
+lemma definition.produit_de_parties {A : set X} {B : set Y}
+{x:X} {y:Y} :
+(x,y) ∈ set.prod A B ↔ x ∈ A ∧ y ∈ B
 :=
 /- dEAduction
 PrettyName
@@ -457,12 +941,7 @@ lemma exercise.produit_avec_intersection
 set.prod A (B ∩ C) = (set.prod A B) ∩ (set.prod A C)
 :=
 begin
-    --rw generalites.definition.egalite_deux_ensembles,
-    --intro z,
-    --have H, from definition.type_produit z,
-    --cases H with x Hx,
-    --cases Hx with y Hy,
-    --rw Hy,
+    sorry
 end
 
 
@@ -507,8 +986,8 @@ begin
     sorry
 end
 
-lemma definition.composition :
-∀ x:X, composition g f x = g (f x)
+lemma definition.composition {x:X}:
+composition g f x = g (f x)
 :=
 begin
     sorry,
@@ -571,13 +1050,7 @@ PrettyName
     Image réciproque d'une intersection de deux ensembles
 -/
 begin
-    rw generalites.definition.egalite_deux_ensembles,
-    intro x,
-    split,
-    intro H1,
-    assumption,
-    intro H2,
-    assumption,
+    sorry
 end
 
 lemma  exercise.image_reciproque_union  : f ⁻¹' (B ∪ B') = f ⁻¹' B ∪ f ⁻¹' B'
@@ -587,14 +1060,7 @@ PrettyName
     Image réciproque d'une union de deux ensembles
 -/
 begin
-    rw generalites.definition.egalite_deux_ensembles,
-    intro x, split,
-    intro H1, 
-    assumption,
-    intro H2,
-    hypo_analysis,
-    targets_analysis,
-    assumption,
+    sorry
 end
 
 -- set_option pp.width 100
@@ -606,9 +1072,7 @@ PrettyName
     Image réciproque d'une intersection quelconque
 -/
 begin
-    rw generalites.definition.egalite_deux_ensembles,
-    intro x, split,
-    intro H1, 
+    sorry
 end
 
 lemma exercise.image_reciproque_union_quelconque :
@@ -704,7 +1168,6 @@ PrettyName
     Application injective
 -/
 begin
-    targets_analysis,
     refl,
 end
 
@@ -803,6 +1266,7 @@ PrettyName
     Surjective si composition surjective
 -/
 begin
+    intro y,
     sorry
 end
 
@@ -852,19 +1316,16 @@ end
 
 lemma exercise.unicite_inverse :
 (bijective f) → exists_unique (λ g : Y → X,
-composition f g = Identite)
+composition g f = Identite)
 :=
 /- dEAduction
 PrettyName
     (+) Unicité de la réciproque d'une application bijective
 -/
 begin
-    intro H1,
-    unfold bijective at H1,
-    cases classical.axiom_of_choice H1 with g H2,
-    dsimp at g, dsimp at H2,
-    use g, dsimp, split,
+    sorry
 end
+
 
 
 
@@ -892,7 +1353,7 @@ begin
     {
         have H22b: x ∈ A,
         rw H15 at H23,
-        -- simp only[ensemble_extension] at H23, 
+        -- simp only[ensemble_extension] at H23,
         rw generalites.definition.ensemble_extension at H23,
         push_neg at H23,
         rw H17, assumption,
@@ -986,26 +1447,7 @@ PrettyName
     Même union et même intersection
 -/
 begin
-    intro H1,
-cases H1 with H2 H3,
-rw theorie_des_ensembles.generalites.definition.egalite_deux_ensembles,
-intro x,
-split,
-intro H4,
-have H6 := @theorie_des_ensembles.unions_et_intersections.exercices.exercise.intersection_inclus_ensemble _ A B,
-cases (classical.em (x dans A)) with H7 H8,
-have H9 := and.intro H7 H4,
-rw <- theorie_des_ensembles.unions_et_intersections.definitions.definition.intersection_deux_ensembles at H9,
-rw H2 at H9,
-rw theorie_des_ensembles.unions_et_intersections.definitions.definition.intersection_deux_ensembles at H9,
-cases H9 with H_aux_0 H_aux_1, assumption,
-have H13 : (x dans ( A union B)),
-rw theorie_des_ensembles.unions_et_intersections.definitions.definition.union_deux_ensembles,
-right,
-{ assumption, trace "EFFECTIVE CODE 4 : assumption"} <|> `[ contradiction, trace "EFFECTIVE CODE 4 : contradiction"] <|> `[ solve1 {norm_num at *}, trace "EFFECTIVE CODE 4 : solve1 {norm_num at *}"], 
-
-{ apply unions_et_intersections.exercices.exercise.intersection_inclus_ensemble, no_meta_vars},
- 
+    sorry
 end
 
 --def diff {X : Type} (A B : set X) := {x ∈ A | ¬ x ∈ B}
@@ -1201,17 +1643,6 @@ end applications
 
 
 end exercices_supplementaires
-
-example (X:Type) (A B: set X) (x:X) (H: x ∈ A ∩ B) : x ∈ B ∩ A :=
-begin
-    apply and.symm, assumption,
-end
- 
-
-
-
-
-
 
 end theorie_des_ensembles
 

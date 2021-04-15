@@ -242,9 +242,7 @@ begin
 end
 
 
-lemma exercise.vraiment_plus_petit : ∃ m:ℤ,
-∀ n:ℤ,
-m ≤ n
+lemma exercise.vraiment_plus_petit : ∃ m:ℤ, ∀ n:ℤ, m ≤ n
 :=
 /- dEAduction
 PrettyName

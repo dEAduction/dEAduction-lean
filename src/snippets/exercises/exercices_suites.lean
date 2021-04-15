@@ -167,6 +167,15 @@ lt_div_iff : 0 < c → (a < b / c ↔ a * c < b)
 lt_div_iff' : 0 < c → (a < b / c ↔ c * a < b)
 -/
 
+lemma exercise.test_compute
+:
+0 ≤ 1 ∧ 2+2 = 4
+:=
+begin
+  sorry
+end
+
+
 lemma exercise.limite_constante 
 (u : ℕ → ℝ) (c : ℝ) (H : ∀ n, u n = c) :
 limite u c :=
@@ -178,11 +187,9 @@ begin
   rw definition.limite,
   intros ε Hε,
   use 0,
-  intros n Hn,
-  rw H n,
-  simp_rw sub_self,
-  simp_rw abs_zero,
-  assumption,
+  intros n H1,
+  rw H,
+`[ solve1 {norm_num at * }, trace "EFFECTIVE CODE n°4.0"] <|> `[ `[ norm_num at *, trace "EFFECTIVE CODE n°5.0"] <|> `[ skip, trace "EFFECTIVE CODE n°5.1"], compute_n 10, trace "EFFECTIVE CODE n°4.1"],
 end
 
 lemma exercise.limite_unique
@@ -222,7 +229,18 @@ PrettyName
   Limite d'une somme
 -/
 begin
-  sorry
+  rw definitions.definition.limite,
+rw definitions.definition.limite at H H',
+intro ε, intro H1,
+have H2 := H _ H1,
+have H3 := H' _ H1,
+cases H2 with n H4,
+cases H3 with n' H5,
+let x2 := max n n', have H7 : x2 = max n n', refl,
+have H9 := @definitions.maximum.theorem.ppe_max_gauche,
+have H10 := H9 n n',
+-- norm_num at H10,
+rw H7 at H10,
 end
 
 

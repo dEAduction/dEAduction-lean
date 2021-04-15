@@ -216,7 +216,11 @@ PrettyName
     Pas zéro ou pas un
 -/
 begin
-    sorry
+    intro n,
+    cases (classical.em (n=0)) with H1 H2,
+    right, 
+ `[ solve1 {norm_num at * }, trace "EFFECTIVE CODE n°0.0"] <|> `[ `[ norm_num at *, trace "EFFECTIVE CODE n°1.0"] <|> `[ skip, trace "EFFECTIVE CODE n°1.1"], compute_n 10, trace "EFFECTIVE CODE n°0.1"],
+
 end
 
 lemma exercise.zero_ou_un_2 : ∀ n:ℕ, (n = 0 or n = 1)
@@ -300,6 +304,15 @@ SimplificationCompute
     $ALL
 -/
 begin
+    assumption <|> intro a, intro H1,
+    intro H2,
+    have H3: (0:ℝ) ≥ 0, rotate, 
+    `[ have H4 := H2 (0:ℝ) H3, trace "EFFECTIVE CODE n°0.0"] <|> `[ have H4 := H2 _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.1"] <|> `[ have H4 := H2 _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.2"] <|> `[ have H4 := H2 _ _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.3"] <|> `[ have H4 := H2 _ _ _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.4"] <|> `[ have H4 := @H2 (0:ℝ) H3, trace "EFFECTIVE CODE n°0.5"] <|> `[ have H4 := @H2 _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.6"] <|> `[ have H4 := @H2 _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.7"] <|> `[ have H4 := @H2 _ _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.8"] <|> `[ have H4 := @H2 _ _ _ _ (0:ℝ) H3, trace "EFFECTIVE CODE n°0.9"], rotate,
+     `[ solve1 {{`[ norm_num at *, trace "EFFECTIVE CODE n°2.0"] <|> `[ skip, trace "EFFECTIVE CODE n°2.1"]},
+      {`[ compute_n 1, trace "EFFECTIVE CODE n°3.0"] <|> `[ skip, trace "EFFECTIVE CODE n°3.1"]} }, trace "EFFECTIVE CODE n°1.0"] 
+      <|> `[ rotate, trace "EFFECTIVE CODE n°1.1"], 
+      rotate,
+
     sorry
 end
 

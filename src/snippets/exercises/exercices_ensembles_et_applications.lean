@@ -1,4 +1,3 @@
--- import data.set
 import tactic
 
 -- dEAduction imports
@@ -16,8 +15,8 @@ import utils
 -- Course metadata --
 ---------------------
 -- logic names ['and', 'or', 'negate', 'implicate', 'iff', 'forall', 'exists']
--- proofs names ['use_proof_methods', 'new_object', 'apply', 'assumption']
--- magic names ['compute']
+-- proofs names ['use_proof_methods', 'new_object', 'apply']
+-- magic names ['compute', 'assumption']
 -- proof methods names ['cbr', 'contrapose', 'absurdum', 'sorry']
 
 
@@ -27,6 +26,8 @@ Title
     Ensembles et applications
 Institution
     Université du monde
+AvailableProof
+    apply
 AvailableMagic
     assumption
 -/
@@ -66,7 +67,6 @@ notation [parsing_only]  A ` intersection ` B := A ∩ B
 notation [parsing_only]  A ` union ` B := A ∪ B
 notation [parsing_only]  A ` inclus ` B := A ⊆ B
 notation [parsing_only]  `vide` := ∅
-
 notation f `⟮` A `⟯` := f '' A
 notation f `⁻¹⟮` A `⟯` := f  ⁻¹' A
 notation [parsing_only] f `inverse` A := f  ⁻¹' A
@@ -226,7 +226,9 @@ end applications
 
 end definitions
 
-
+-----------------
+--- EXERCICES ---
+-----------------
 namespace exercices
 variables  {A A': set X}
 variables {f: X → Y} {B B': set Y}
@@ -252,7 +254,7 @@ B ⊆ B' → f ⁻¹' B ⊆ f ⁻¹' B'
 :=
 /- dEAduction
 PrettyName
-    Image directe et inclusion
+    Image réciproque et inclusion
 -/
 begin
     sorry
@@ -355,6 +357,13 @@ PrettyName
     Caractérisation
 -/
 
+lemma definition.singleton {x x' : X} : 
+x' ∈ ({x} : set X) ↔ x' = x :=
+begin
+  exact mem_singleton_iff,
+end
+
+
 
 lemma exercise.image_de_reciproque_3
 (f: X → Y) (H : ∀ B : set Y, f '' (f ⁻¹' B)  = B )  :
@@ -362,6 +371,8 @@ lemma exercise.image_de_reciproque_3
 /- dEAduction
 PrettyName
     Image de l'image réciproque, caractérisation de la surjectivité
+AvailableProof
+    use_proof_methods new_object apply
 -/
 begin
     sorry
@@ -375,9 +386,48 @@ injective f :=
 /- dEAduction
 PrettyName
     Image réciproque de l'image, caractérisation de l'injectivité
+AvailableProof
+    use_proof_methods new_object apply
 -/
 begin
-    sorry
+  rw injective,
+  by_contradiction H2,
+  push_neg at H2,
+  rcases H2 with ⟨ x, x', ⟨ H3, H4⟩ ⟩, 
+  -- set A := ({x}: set X) with HA,
+  -- have H := ({x, x'}: set X) ⊆ (f ⁻¹' (f '' A)),
+  have H' := H {x},
+  have H5 : x' ∈ (f ⁻¹' (f '' {x})),
+    {rw definitions.applications.definition.image_reciproque,
+    rw ← H3,
+    rw definitions.applications.definition.image_directe,
+    use x, split, apply definition.singleton.symm.mp, refl,
+    exact rfl
+    },
+  rw ← H' at H5,
+  have H6 : x = x', exact ((definition.singleton).mp H5).symm,
+  exact H4 H6,
+end
+
+lemma example_reciproque_de_image_3
+(f: X → Y) (H : ∀ A : set X, A = f ⁻¹' (f '' A)) :
+injective f :=
+begin
+  rw injective,
+  intros x x' H1,
+  -- set A := ({x}: set X) with HA,
+  -- have H := ({x, x'}: set X) ⊆ (f ⁻¹' (f '' A)),
+  have H' := H {x},
+  have H2 : (x' dans (f inverse (f '' {x}))),
+    {rw definitions.applications.definition.image_reciproque,
+    rw ← H1,
+    rw definitions.applications.definition.image_directe,
+    use x, split, apply definition.singleton.symm.mp, refl,
+    exact rfl,
+    },
+  rw ← H' at H2,
+  have H3 : x = x', exact ((definition.singleton).mp H2).symm,
+  assumption,
 end
 
 
@@ -388,6 +438,8 @@ injective f
 /- dEAduction
 PrettyName
     Image directe d'une intersection, caractérisation de l'injectivité
+AvailableProof
+    use_proof_methods new_object apply
 -/
 begin    
     sorry

@@ -13,6 +13,8 @@ import utils
 
 -- no Magic button ("compute")
 /- dEAduction
+Title
+    Logique propositionnelle (tutorial)
 DefaultAvailableProof
     NONE
 DefaultAvailableMagic
