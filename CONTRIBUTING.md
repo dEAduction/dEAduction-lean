@@ -126,6 +126,9 @@ end
 end definitions
 namespace exercises
 
+------------------------
+-- EXERCISES --
+------------------------
 lemma exercise.inclusion_transitive
 (A B C : set X) :
 (A ⊆ B ∧ B ⊆ C) → A ⊆ C
