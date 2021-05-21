@@ -30,7 +30,7 @@ Author
 Institution
     Université de France
 AvailableMagic
-    NONE
+    ALL -compute
 -/
 
 
@@ -1117,6 +1117,29 @@ end
 
 -- TODO: ajouter exoset ficall.pdf exos (140 bijections) 141 142 146
 
+lemma exercise.injectivite_categorielle
+(f: Y → Z):
+(injective f) → (∀X: Type, ∀ g h : X → Y, (composition f g) = (composition f h) → g = h)
+:=
+/- dEAduction
+PrettyName
+    Injectivité catégorielle
+-/
+begin
+    todo
+end
+
+lemma exercise.surjectivite_categorielle
+(f: X → Y):
+(surjective f) →  (∀Z: Type, ∀ g h : Y → Z, (composition g f ) = (composition h f ) → g = h)
+:=
+/- dEAduction
+PrettyName
+    Surjectivité catégorielle
+-/
+begin
+    todo
+end
 
 end applications
 
