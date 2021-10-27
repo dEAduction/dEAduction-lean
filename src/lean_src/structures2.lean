@@ -1,7 +1,21 @@
-import data.real.basic
+/-
+This files provides the tactics 
+    hypo_analysis
+    targets_analysis
+which output a string reflecting the lean expr for objects in the
+and in the target. The key function is analysis_expr_step that pattern
+matches an object to determine a short string reflecting its node
+(e.g., "INCLUSION"), and children (e.g. here, corresponding to the left 
+and righ hand side of the inclusion property).
+The two tactics also provides the types of all intermediate objects.
+
+Authors: Frédéric Le Roux
+-/
+
 import data.set
 import tactic
-import notations_definitions
+import parser_analysis_definitions
+
 
 namespace tactic.interactive
 open lean.parser tactic interactive
@@ -10,7 +24,7 @@ open interactive.types
 open tactic expr
 local postfix *:9001 := many -- necessary for ident*
 
-set_option pp.width 1000
+set_option pp.width 1000 -- We do not want CR inside our strings
 
 def separator_object := "¿¿¿"
 def separator_comma := "¿, "
@@ -47,9 +61,11 @@ end
 
 open set
 
-/- Decompose the root of an expression (just one step)
+/- The key function. Decompose the root of an expression (just one step)
 General types should be at the end.
 -/
+
+
 private meta def analysis_expr_step  (e : expr) : tactic (string × (list expr)) :=
 do  S ←  (tactic.pp e), let e_joli := to_string S,
 match e with
@@ -68,7 +84,7 @@ match e with
 | `(%%A ∩ %%B) := return ("SET_INTER", [A,B])
 | `(%%A ∪ %%B) := return ("SET_UNION", [A,B])
 | `(set.compl %%A) := return ("SET_COMPLEMENT", [A])
-| `(set.symmetric_difference %%A %%B) := return ("SET_DIFF_SYM", [A,B])
+-- | `(set.symmetric_difference %%A %%B) := return ("SET_DIFF_SYM", [A,B])
 | `(%%A \ %%B) := return ("SET_DIFF", [A,B])
 | `(%%A ⊆ %%B) := return ("PROP_INCLUDED", [A,B])
 | `(%%a ∈ %%A) := return ("PROP_BELONGS", [a,A])
@@ -92,6 +108,8 @@ match e with
                 return ("SET_INTENSION",[X, var_, inst_body])
     | _ := return ("SET_INTENSION", [X, P])
     end
+| `(index_set) := return ("TYPE", [])
+| `(set_family %%I %%X) := return ("SET_FAMILY", [I, X])
 | (pi name binder type body) := do
     let is_arr := is_arrow e,
     if is_arr
@@ -100,17 +118,14 @@ match e with
             if is_pro
                 then return ("PROP_IMPLIES", [type,body])
                 else match e with
-                -- do expr_f ←  infer_type type,
-                -- if expr_f = `(Type )
-                    | `(%%X → %%Y) :=
-                    match X with
+                    | `(%%X → %%Y) := match X with
                         | `(ℕ) := return ("SEQUENCE", [X, Y])
-                        | _ := do
-                        match Y with
-                            | `(_root_.set %%Z) :=
-                        if Z = X
-                            then return ("FUNCTION", [X, Y])
-                            else return ("SET_FAMILY", [X, Z])
+                        | _ := do X_type ← infer_type X,
+                            match (X_type, Y) with
+                        -- A set family is when source is an index_set
+                        -- (just a type which is "tagged" for serving as index)
+                        -- and target is "set something"
+                            | (`(index_set), `(_root_.set %%Z)) := return ("SET_FAMILY", [X, Z])
                             | _ := return ("FUNCTION", [X, Y])
                             end
                         end
@@ -151,7 +166,6 @@ match e with
 | `(%%a × %%b) := return ("PRODUCT", [a, b]) -- TODO: distinguish types/numbers
 | `(%%a / %%b) := return ("DIV", [a, b])
 ------------------------------ Leaves with data ---------------------------
--- | `(%%g ∘ %%f) := return ("COMPOSITION", [g,f])  does not work
 | (app function argument)   :=
     if is_numeral e
         then return ("NUMBER" ++ open_bra ++ "value: " ++ e_joli ++ closed_bra, [])
@@ -384,3 +398,11 @@ match names with
 
 
 end tactic.interactive
+
+
+-- example (X Y: Type) (f: set X → set X) (I: set.index_set) (E: I → set X)
+-- (F: I → X) (G: I → set (X × Y)) (H: Y → set X):
+-- true := 
+-- begin
+--     hypo_analysis,
+-- end

@@ -1,26 +1,32 @@
--- import data.set
+/-
+This is a d∃∀duction file providing exercises for basic set theory. French version.
+-/
+
+import data.set
 import tactic
 
--- dEAduction imports
-import structures2
-import notations_definitions
-import utils
+-- dEAduction tactics
+import structures2      -- hypo_analysis, targets_analysis
+import utils            -- no_meta_vars
+import user_notations   -- notations that can be used in deaduction UI for a new object
+
+-- dEAduction definitions
+import set_definitions
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
 -- other parameters are implicit in definitions, i.e. defined using '{}' (e.g. {A : set X} )
 -- but explicit everywhere else, i.e. defined using '()' (e.g. (A : set X) )
--- each definition must be an iff statement (since it will be called with 'rw' or 'symp_rw')
+-- each definition must be an iff statement or an equality
+-- (since it will be called with 'rw' or 'symp_rw')
 
----------------------
--- Course metadata --
----------------------
+-------------------------
+-- dEAduction METADATA --
+-------------------------
 -- logic names ['and', 'or', 'negate', 'implicate', 'iff', 'forall', 'exists']
 -- proofs names ['use_proof_methods', 'new_object', 'apply', 'assumption']
 -- magic names ['compute']
--- proof methods names ['cbr', 'contrapose', 'absurdum', 'todo']
-
-
+-- proof methods names ['cbr', 'contrapose', 'absurdum', 'sorry']
 
 /- dEAduction
 Title
@@ -29,13 +35,13 @@ Author
     Frédéric Le Roux
 Institution
     Université de France
+Description
+    Ce cours correspond à un cours standard de théorie "élémentaire" des ensembles.
 AvailableMagic
-    assumption
+    ALL -compute
 -/
 
-
 local attribute [instance] classical.prop_decidable
-
 
 ---------------------------------------------
 -- global parameters = implicit variables --
@@ -43,37 +49,6 @@ local attribute [instance] classical.prop_decidable
 section course
 parameters {X Y Z: Type}
 
-notation [parsing_only] P ` and ` Q := P ∧ Q
-notation [parsing_only]  P ` or ` Q := P ∨ Q
-notation [parsing_only]  ` not ` P := ¬ P
-notation [parsing_only]  P ` implies ` Q := P → Q
-notation [parsing_only]  P ` iff ` Q := P ↔ Q
-
-notation [parsing_only]  x ` in ` A := x ∈ A
-notation [parsing_only]  A ` cap ` B := A ∩ B
-notation [parsing_only]  A ` cup ` B := A ∪ B
-notation [parsing_only]  A ` subset ` B := A ⊆ B
-notation [parsing_only]  `emptyset` := ∅
-
-notation [parsing_only] P ` et ` Q := P ∧ Q
-notation [parsing_only]  P ` ou ` Q := P ∨ Q
-notation [parsing_only]  ` non ` P := ¬ P
-notation [parsing_only]  P ` implique ` Q := P → Q
-notation [parsing_only]  P ` ssi ` Q := P ↔ Q
-
-notation [parsing_only]  x ` dans ` A := x ∈ A
-notation [parsing_only]  x ` appartient ` A := x ∈ A
-notation [parsing_only]  A ` inter ` B := A ∩ B
-notation [parsing_only]  A ` intersection ` B := A ∩ B
-notation [parsing_only]  A ` union ` B := A ∪ B
-notation [parsing_only]  A ` inclus ` B := A ⊆ B
-notation [parsing_only]  `vide` := ∅
-
-notation f `⟮` A `⟯` := f '' A
-notation f `⁻¹⟮` A `⟯` := f  ⁻¹' A
-notation [parsing_only] f `inverse` A := f  ⁻¹' A
-notation g `∘` f := set.composition g f
-notation `∃!` P := exists_unique P
 
 open set
 
@@ -96,8 +71,12 @@ PrettyName
 -- COURSE DEFINITIONS --
 ------------------------
 lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
+/- dEAduction
+ImplicitUse
+    True
+-/
 begin
-    exact iff.rfl
+    exact iff.rfl,
 end
 
 lemma definition.egalite_deux_ensembles {A A' : set X} :
@@ -105,6 +84,8 @@ lemma definition.egalite_deux_ensembles {A A' : set X} :
 /- dEAduction
 PrettyName
     Egalité de deux ensembles
+ImplicitUse
+    True
 -/
 begin
      exact set.ext_iff
@@ -138,14 +119,16 @@ begin
 end
 
 
-lemma theorem.double_inclusion (A A' : set X) :
-(A ⊆ A' ∧ A' ⊆ A) → A = A' :=
+lemma definition.double_inclusion (A A' : set X) :
+A = A' ↔ (A ⊆ A' ∧ A' ⊆ A) :=
 /- dEAduction
 PrettyName
-    Double inclusion
+    Egalité de deux ensembles : double inclusion
+ImplicitUse
+    True
 -/
 begin
-    exact set.subset.antisymm_iff.mpr
+    exact set.subset.antisymm_iff
 end
 
 lemma exercise.inclusion_transitive
@@ -184,13 +167,15 @@ x ∈ A ∩ B ↔ ( x ∈ A ∧ x ∈ B) :=
 /- dEAduction
 PrettyName
     Intersection de deux ensembles
+ImplicitUse
+    True
 -/
 begin
     exact iff.rfl
 end
 
 lemma definition.intersection_quelconque_ensembles {I : Type} {E : I → set X}  {x : X} :
-(x ∈ set.Inter (λ i, E i)) ↔ (∀ i:I, x ∈ E i) :=
+(x ∈ set.Inter E) ↔ (∀ i:I, x ∈ E i) :=
 /- dEAduction
 PrettyName
     Intersection d'une famille quelconque d'ensembles
@@ -204,6 +189,8 @@ x ∈ A ∪ B ↔ ( x ∈ A ∨ x ∈ B) :=
 /- dEAduction
 PrettyName
     Union de deux ensembles
+ImplicitUse
+    True
 -/
 begin
     exact iff.rfl
@@ -256,7 +243,15 @@ ExpectedVarsNumber
     X=3, A=1, B=1
 -/
 begin
-    todo
+    rw generalites.definition.egalite_deux_ensembles,
+    intro x, split,
+    intro H,
+    cases H with H1 H2,
+    cases H2 with H2a H2b,
+    left,
+    split,
+    assumption, assumption,
+    right, split, assumption, assumption, todo
 end
 
 -- NB: 'ExpectedVarsNumber' is not implemented yet
@@ -288,7 +283,7 @@ end unions_et_intersections
 namespace complementaire
 -- variables complementaire --
 variables  {A B : set X}
-variables {I : Type} {E F : I → set X}
+variables {I : index_set} {E F : I → set X}
 -- notation `∁`A := set.compl A
 
 -----------------
@@ -302,10 +297,6 @@ PrettyName
 begin
     finish
 end
-
---lemma definition.difference_d_ensembles {A B : set X} {x : X} : x ∈ B \ A ↔ (x ∈ B ∧ x ∉ A) :=
--- iff.rfl
-
 
 ---------------
 -- EXERCICES --
@@ -441,7 +432,8 @@ PrettyName
 
 variables  {A A': set X}
 variables {f: X → Y} {B B': set Y}
-variables {I : Type} {E : I → set X} {F : I → set Y}
+-- variables {I : Type} {E : I → set X} {F : I → set Y}
+variables {I : index_set} {E : set_family I X} {F : set_family I Y}
 variables (g : Y → Z) (h : X → Z)
 
 -- a-t-on besoin de ceci ?
@@ -457,6 +449,7 @@ namespace definitions
 PrettyName
     Définitions
 -/
+
 lemma definition.image_directe (y : Y) : y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
 begin
     todo
@@ -546,7 +539,8 @@ end
 
 -- set_option pp.width 100
 lemma exercise.image_reciproque_inter_quelconque :
-(f ⁻¹'  (set.Inter (λ i, F i))) = set.Inter (λ i, f ⁻¹' (F i))
+(f ⁻¹'  (set.Inter (F))) = set.Inter (λ i, f ⁻¹' (F i): set_family I X)
+-- (f ⁻¹'  (set.Inter (λ i, F i))) = set.Inter (λ i, f ⁻¹' (F i))
 :=
 /- dEAduction
 PrettyName
@@ -634,19 +628,14 @@ PrettyName
     Définitions
 -/
 
-/-
-def injective {X Y : Type} (f₀ : X → Y) := ∀ x x' : X, (f₀ x = f₀ x' → x = x')
-def surjective {X Y : Type} (f₀ : X → Y) := ∀ y : Y, ∃ x : X, y = f₀ x
-def composition {X Y Z : Type} (g₀ : Y → Z) (f₀ : X → Y) := λx:X, g₀ (f₀ x)
-def Identite {X : Type} := λ x:X, x
--/
-
 lemma definition.injectivite :
-injective f ↔ ∀ x x' : X, (f x = f x' → x = x')
+injective f ↔ ∀ x y : X, (f x = f y → x = y)
 :=
 /- dEAduction
 PrettyName
     Application injective
+ImplicitUse
+    True
 -/
 begin
     refl,
@@ -658,6 +647,8 @@ surjective f ↔ ∀ y : Y, ∃ x : X, y = f x
 /- dEAduction
 PrettyName
     Application surjective
+ImplicitUse
+    True
 -/
 begin
     refl,
@@ -676,18 +667,30 @@ begin
     todo
 end
 
-lemma definition.bijectivite :
+lemma definition.bijectivite_1 :
+bijective f ↔ (injective f ∧ surjective f)
+:=
+/- dEAduction
+PrettyName
+    Application bijective (première définition)
+-/
+begin
+    todo
+end
+
+lemma definition.bijectivite_2 :
 bijective f ↔ ∀ y : Y, exists_unique (λ x, y = f x)
 :=
 /- dEAduction
 PrettyName
-    Application bijective
+    Application bijective (seconde définition)
 -/
 begin
     refl,
 end
 
 end definitions
+
 
 
 ---------------
@@ -700,6 +703,13 @@ PrettyName
 -/
 
 open applications_II.definitions
+
+
+example (f: X → Y) (x x' : X) (B: set Y) (H: f x' ∈ B) (H' : x=x') : f x ∈ B :=
+begin
+    cc,
+end
+
 
 lemma exercise.composition_injections
 (H1 : injective f) (H2 : injective g)
@@ -765,29 +775,6 @@ lemma exercise.surjective_ssi_inverse_droite : (surjective f) ↔
 /- dEAduction
 PrettyName
     (*) Surjectivité et inverse à droite
--/
-begin
-    todo
-end
-
-lemma exercise.surjective_si_compo_avec_injective_est_surjective :
-(surjective (composition g f)) ∧ (injective g) → surjective f
-:=
-/- dEAduction
-PrettyName
-    Surjectivité si compo avec injective donne surjective
--/
-begin
-    todo
-end
-
-
-lemma exercise.bijective_ssi_injective_et_surjective :
-(bijective f) ↔ (injective f ∧ surjective f)
-:=
-/- dEAduction
-PrettyName
-    (**) "Bijectif" équivaut à "injectif et surjectif"
 -/
 begin
     todo
@@ -1075,75 +1062,6 @@ variable (f: X → Y)
 
 namespace applications
 
-lemma exercise.exercice_image_intersection_2
-(A B : set X) (f: X → Y) (H: injective f):
-f ''(A ∩ B) = f '' A ∩ f '' B
-:=
-/- dEAduction
-PrettyName
-    Image directe d'une intersection, II
--/
-begin
-    todo
-end
-
-lemma exercise.exercice_image_intersection_3
-(f: X → Y)  (H : ∀ A B : set X, f ''(A ∩ B) = f '' A ∩ f '' B) :
-injective f
-:=
-/- dEAduction
-PrettyName
-    Image directe d'une intersection, caractérisation de l'injectivité
--/
-begin    
-    todo
-end
-
-
-lemma exercise.image_de_reciproque_2
-(B : set Y)  (H: surjective f) : f '' (f ⁻¹' B)  = B :=
-/- dEAduction
-PrettyName
-    Image de l'image réciproque, cas surjectif
--/
-begin
-    todo
-end
-
-lemma exercise.image_de_reciproque_3
-(f: X → Y) (H : ∀ B : set Y, f '' (f ⁻¹' B)  = B )  :
- surjective f :=
-/- dEAduction
-PrettyName
-    Image de l'image réciproque, caractérisation de la surjectivité
--/
-begin
-    todo
-end
-
-lemma exercise.reciproque_de_image_2
-(A : set X)  (f: X → Y)  (H: injective f) : A = f ⁻¹' (f '' A) :=
-/- dEAduction
-PrettyName
-    Image réciproque de l'image, cas injectif
--/
-begin
-    todo
-end
-
-lemma exercise.reciproque_de_image_3
-(f: X → Y) (H : ∀ A : set X, A = f ⁻¹' (f '' A)) :
-injective f :=
-/- dEAduction
-PrettyName
-    Image réciproque de l'image, caractérisation de l'injectivité
--/
-begin
-    todo
-end
-
-
-
 lemma exercise.exercice_applications_1
 (A B : set X) :
 A ⊆ B → f '' A ⊆ f '' B
@@ -1197,6 +1115,29 @@ end
 
 -- TODO: ajouter exoset ficall.pdf exos (140 bijections) 141 142 146
 
+lemma exercise.injectivite_categorielle
+(f: Y → Z):
+(injective f) → (∀X: Type, ∀ g h : X → Y, (composition f g) = (composition f h) → g = h)
+:=
+/- dEAduction
+PrettyName
+    Injectivité catégorielle
+-/
+begin
+    todo
+end
+
+lemma exercise.surjectivite_categorielle
+(f: X → Y):
+(surjective f) →  (∀Z: Type, ∀ g h : Y → Z, (composition g f ) = (composition h f ) → g = h)
+:=
+/- dEAduction
+PrettyName
+    Surjectivité catégorielle
+-/
+begin
+    todo
+end
 
 end applications
 

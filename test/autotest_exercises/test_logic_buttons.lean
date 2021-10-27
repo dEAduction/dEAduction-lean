@@ -238,7 +238,7 @@ lemma exercise.test_construct_or_right
 /- dEAduction
 AutoTest
     ∨ 0,
-    CQFD,
+    CQFD
 -/
 begin
   sorry
@@ -249,7 +249,7 @@ lemma exercise.test_construct_or_left
 /- dEAduction
 AutoTest
     ∨ 1,
-    CQFD,
+    CQFD
 -/
 begin
   sorry
@@ -291,7 +291,7 @@ P ∨ Q :=
 /- dEAduction
 AutoTest
     H1 ∨ Q 0,
-    CQFD,
+    CQFD
 -/
 begin
   sorry
@@ -303,7 +303,7 @@ P ∨ Q :=
 /- dEAduction
 AutoTest
     H1 ∨ P 1,
-    CQFD,
+    CQFD
 -/
 begin
   sorry
@@ -548,8 +548,88 @@ AutoTest
 begin
   sorry
 end  
+end test_exists
+
+namespace test_equality
+----------------
+--- equality ---
+----------------
+
+lemma exercise.test_apply_equality1
+(A B: set X) (x y : X) (f: X → Y) (H: x = y) (H': x ∈ A) (H'': A =B):
+y ∈ B :=
+/- dEAduction
+AutoTest
+    H' H =,
+    H' H'' =,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_equality_target1
+(x y : X) (f: X → Y) (H: x = y):
+f x= f y :=
+/- dEAduction
+AutoTest
+    H = 0
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_equality_target2
+(x y : X) (f: X → Y) (H: x = y):
+f x= f y :=
+/- dEAduction
+AutoTest
+    H = 1
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_equality_equality1
+(x y z: X) (f: X → Y) (H: x = y) (H': y = z):
+x = z :=
+/- dEAduction
+AutoTest
+    H' H = 0,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_equality_equality2
+(x y z : X) (f: X → Y) (H: x = y) (H': y = z):
+x = z :=
+/- dEAduction
+AutoTest
+    H' H = 1,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_equality_equality_and_direction
+(x y z : X) (f: X → Y) (H: x = y) (H': y = x):
+x = z :=
+/- dEAduction
+AutoTest
+    H' H = 0 0,
+    proof_methods 3
+-/
+begin
+  sorry
+end
 
 
+
+
+end test_equality
 
 /- The following exo does not work. Pb= 
 ∃ x ∈ A, P(x)
@@ -573,7 +653,6 @@ AutoTest
     @O5 @P5 ∃,
     CQFD
 -/
-end test_exists
 end tests_logic_buttons
 end theorie_des_ensembles
 end course

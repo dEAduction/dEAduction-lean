@@ -1,3 +1,9 @@
+/- This file provides the no_meta_var tactics,
+which checks that target or context contains no meta var.
+Author: Frédéric Le Roux
+-/
+
+
 import tactic
 
 ------------------------------------------------
@@ -53,21 +59,21 @@ end tactic
 
 
 -- Tests
-open tactic.interactive
-example : ∃ x : ℕ, x = 0 :=
-begin
-   no_meta_vars,
-   existsi _,
-   context_no_meta_vars,
-   have H: 0=0,
-   {refl, trace "toto", no_meta_vars},
-   -- no_meta_vars,
-   sorry
-end
+-- open tactic.interactive
+-- example : ∃ x : ℕ, x = 0 :=
+-- begin
+--    no_meta_vars,
+--    existsi _,
+--    context_no_meta_vars,
+--    have H: 0=0,
+--    {refl, trace "toto", no_meta_vars},
+--    -- no_meta_vars,
+--    sorry
+-- end
 
 
-example (H1 : ∀ x:ℕ, x=0) (y:ℕ) : y = 0 :=
-begin
-   sorry
-   -- don't know how to produce metavars in context!
-end
+-- example (H1 : ∀ x:ℕ, x=0) (y:ℕ) : y = 0 :=
+-- begin
+--    sorry
+--    -- don't know how to produce metavars in context!
+-- end

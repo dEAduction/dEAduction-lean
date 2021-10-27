@@ -63,6 +63,8 @@ notation [parsing_only]  P ` ssi ` Q := P ↔ Q
 notation [parsing_only]  x ` dans ` A := x ∈ A
 notation [parsing_only]  x ` appartient ` A := x ∈ A
 notation [parsing_only]  A ` inter ` B := A ∩ B
+
+
 notation [parsing_only]  A ` intersection ` B := A ∩ B
 notation [parsing_only]  A ` union ` B := A ∪ B
 notation [parsing_only]  A ` inclus ` B := A ⊆ B
@@ -159,19 +161,13 @@ AutoStep
     →, @P1 ∧
 -/
 begin
-    intro H1,
-    rw definition.inclusion,
-    intros x H2,
-    cases H1 with H3 H4,
-    rw definition.inclusion at H3 H4,
-    have H5 := H3 H2,
-    have H6 := H4 H5,
-    assumption,
+    sorry
 end
 
 example (x y:X) (H : x ≠ y) : y ≠ x :=  
 begin
-    apply ne.symm, assumption,
+    apply ne.symm,
+    assumption,
 end
  
 end generalites
@@ -183,8 +179,11 @@ end generalites
 ---------------------------
 namespace tests_proof_buttons
 
--- Case base reasoning --
+-------------------
+-- Proof methods --
+-------------------
 
+-- Case base reasoning --
 lemma exercise.test_case_base_reasoning
 (P: Prop):
 P ∨ ¬ P :=
@@ -242,12 +241,15 @@ lemma exercise.test_sorry
 P :=
 /- dEAduction
 AutoTest
-    proof_methods 3,
-    CQFD
+    proof_methods 3
 -/
 begin
   sorry
 end
+
+-----------------
+-- Now objects --
+-----------------
 
 lemma exercise.test_introduce_new_object
 (x: X):
@@ -290,7 +292,65 @@ AutoTest
 begin
   sorry
 end
+
+-----------
+-- Apply --
+-----------
+lemma exercise.test_apply_equality
+(x y : X) (f: X → Y) (H: x = y):
+f(x) = f(y) :=
+/- dEAduction
+AutoTest
+    H f apply,
+    CQFD
+-/
+begin
+  sorry
+end
+
+
+lemma exercise.test_apply_equality2
+(A B: set X) (x y : X) (f: X → Y) (H: x = y) (H': x ∈ A) (H'': A =B):
+y ∈ B :=
+/- dEAduction
+AutoTest
+    H' H apply,
+    H' H'' apply,
+    CQFD
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_error_1
+(A B: set X) (x y : X) (f: X → Y) (H: x = y) (H': x ∈ A) (H'': A =B):
+y ∈ B :=
+/- dEAduction
+AutoTest
+    H' apply WUI error=appliquer_ceci,
+    proof_methods 3
+-/
+begin
+  sorry
+end
+
+lemma exercise.test_apply_error_2
+(A B: set X) (x y : X) (f: X → Y) (H: x = y) (H': x ∈ A) (H'': A =B):
+y ∈ B :=
+/- dEAduction
+AutoTest
+    CQFD FRE error=pas_comment_conclure,
+    proof_methods 3
+-/
+begin
+  sorry
+end
 end tests_proof_buttons
+
+
+
+
+
 
 
 end theorie_des_ensembles

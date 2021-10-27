@@ -206,7 +206,7 @@ begin
 end
 
 
-lemma essai1 (a b x : ℝ): x ∈ [a, b] → x ≤ b
+lemma essai1 (a b x : ℝ): x ∈ [0, 1] → x ≤ b
 := 
 begin
     intro h,
