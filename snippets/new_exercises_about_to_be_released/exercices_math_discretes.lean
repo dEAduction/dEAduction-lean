@@ -1,9 +1,13 @@
 --import data.set
 import tactic
 
--- dEAduction imports
-import utils
-import structures2
+-- dEAduction tactics
+import structures2      -- hypo_analysis, targets_analysis
+import utils            -- no_meta_vars
+import user_notations   -- notations that can be used in deaduction UI for a new object
+
+-- dEAduction definitions
+import set_definitions
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere

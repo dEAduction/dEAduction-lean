@@ -15,11 +15,14 @@ import data.real.basic
 -/
 
 
--- dEAduction imports
-import structures2
-import compute
-import utils
--- import notations_definitions
+-- dEAduction tactics
+import structures2      -- hypo_analysis, targets_analysis
+import utils            -- no_meta_vars
+import user_notations   -- notations that can be used in deaduction UI for a new object
+
+-- dEAduction definitions
+-- import set_definitions
+import real_definitions
 
 
 local attribute [instance] classical.prop_decidable
@@ -91,13 +94,14 @@ namespace valeur_absolue
 
 lemma theorem.valeur_absolue
 (x : ℝ) : 
-(x ≥ 0 → |x| = x) and (x ≤ 0 → |x| = -x) :=
+((0 ≤ x) → (abs x = x)) and ((x ≤ 0) → (abs x = -x)) :=
 begin
   split, exact abs_of_nonneg, exact abs_of_nonpos,
 end
 
 lemma theorem.majoration_valeur_absolue
-(x : ℝ) (r : ℝ) : (|x| < r) ↔ ((-r < x) ∧ (x < r))
+(x : ℝ) (r : ℝ) :
+(|x| < r) ↔ ((-r < x) ∧ (x < r))
 := 
 /- dEAduction
 PrettyName
