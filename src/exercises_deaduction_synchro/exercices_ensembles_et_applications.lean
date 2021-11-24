@@ -248,7 +248,7 @@ variables {f: X → Y} {B B': set Y}
 
 
 ---------------------------------
-namespace image_directe
+namespace image_directe_inclusion
 /- dEAduction
 PrettyName
   Image directe et inclusion
@@ -288,12 +288,12 @@ begin
   todo
 end
 
-end image_directe
+end image_directe_inclusion
 
 
 
 ---------------------------------
-namespace image_reciproque
+namespace image_reciproque_inclusion
 /- dEAduction
 PrettyName
   Image réciproque et inclusion
@@ -333,7 +333,7 @@ begin
   todo
 end
 
-end image_reciproque
+end image_reciproque_inclusion
 
 
 ---------------------------------
