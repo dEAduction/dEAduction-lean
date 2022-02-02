@@ -30,7 +30,7 @@ DefaultAvailableMagic
 -/
 
 
--- logic names ['and', 'or', 'negate', 'implies', 'iff', 'forall', 'exists']
+-- logic names ['and', 'or', 'not', 'implies', 'iff', 'forall', 'exists']
 -- proofs names ['proof_methods', 'new_object', 'apply']
 -- magic names ['compute', 'assumption']
 
@@ -154,7 +154,7 @@ Description
     On peut l'utiliser uniquement sur les propriétés qui sont des négations,
     c'est-à-dire de la forme "NON (...)".
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableMagic
     assumption
 -/
@@ -172,7 +172,7 @@ Description
     En général, le bouton "NON" tente de "pousser" la négation le long de la
     propriété.
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableMagic
     assumption
 -/
@@ -190,9 +190,9 @@ PrettyName
 Description
     Le mécanisme de preuve inclus le tiers exclu, de façon un peu cachée...
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableProof
-    use_proof_methods
+    proof_methods
 AvailableMagic
     assumption
 -/
@@ -211,11 +211,12 @@ Description
     propriété "P" pour obtenir la propriété "Q". Attention, avant de
     l'actionner il faut sélectionner toutes les propriétés requises !
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableProof
-    use_proof_methods apply
+    proof_methods
 AvailableMagic
     assumption
+
 -/
 begin
     sorry
@@ -230,9 +231,9 @@ PrettyName
 Description
     Cette propriété permet de transformer une implication en une disjonction
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableProof
-    use_proof_methods apply
+    use_proof_methods
 AvailableMagic
     assumption
 -/
@@ -252,9 +253,9 @@ Description
     le résultat de l'exercice précédent. Pour cela, il faudra introduire
     un nouvel objet, avant de lui appliquer le résultat précédent...
 AvailableLogic
-    and or negate implies iff
+    and or not implies iff
 AvailableProof
-    use_proof_methods new_object apply
+    use_proof_methods new_object
 AvailableMagic
     assumption
 -/
