@@ -94,7 +94,7 @@ meta def is_constant_of (l: list name) : expr → bool
 -- `nat is the name "nat" (a string)
 -- ℕ is also a type, we need the expression representing that type
 -- we antiquote expression : `(ℕ) is the expression representing ℕ
-#eval is_constant_of [`real, `int] `(ℕ)
+#eval is_constant_of [`real, `int, `nat] `(ℕ)
 
 
 /- Une fonction qui dit si une expression est une fonction 
