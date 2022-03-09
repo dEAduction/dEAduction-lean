@@ -846,7 +846,10 @@ PrettyName
   Image réciproque et inclusion (iii)
 -/
 begin
-  todo
+  intros surj_f A B incl y y_dans_A,
+  have ex_x := surj_f y, cases ex_x with x eq,
+  have but: (x dans (set.preimage f A)),
+
 end
 
 end injectivite_surjectivite_autres
