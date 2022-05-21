@@ -28,17 +28,17 @@ do e ← whnf_reducible e,
       (do ne ← whnf_reducible ne,
       match ne with
       | `(¬ %%a)      := do pr ← mk_app ``not_not_eq [a],
-                            return (some (a, pr))
+                            return $ some (a, pr)
       | `(%%a ∧ %%b)  := do pr ← mk_app ``not_and_eq [a, b],
-                            return (some (`((%%a : Prop) → ¬ %%b), pr))
+                            return $ some (`((%%a : Prop) → ¬ %%b), pr)
       | `(%%a ∨ %%b)  := do pr ← mk_app ``not_or_eq [a, b],
-                            return (some (`(¬ %%a ∧ ¬ %%b), pr))
+                            return $ some (`(¬ %%a ∧ ¬ %%b), pr)
       | `(%%a ≤ %%b)  := do e ← to_expr ``(%%b < %%a),
                             pr ← mk_app ``not_le_eq [a, b],
-                            return (some (e, pr))
+                            return $ some (e, pr)
       | `(%%a < %%b)  := do e ← to_expr ``(%%b ≤ %%a),
                             pr ← mk_app ``not_lt_eq [a, b],
-                            return (some (e, pr))
+                            return $ some (e, pr)
       | `(Exists %%p) := do pr ← mk_app ``not_exists_eq [p],
                             e ← match p with
                                 | (lam n bi typ bo) := do
@@ -46,16 +46,16 @@ do e ← whnf_reducible e,
                                     return (pi n bi typ body)
                                 | _ := tactic.fail "Unexpected failure negating ∃"
                                 end,
-                            return (some (e, pr))
+                            return $ some (e, pr)
       | (pi n bi d p) := if p.has_var then do
                             pr ← mk_app ``not_forall_eq [lam n bi d p],
                             body ← mk_app ``not [p],
                             e ←  mk_app ``Exists [lam n bi d body],
-                            return (some (e, pr))
+                            return $ some (e, pr)
                          else do
                             pr ← mk_app ``not_implies_eq [d, p],
                             `(%%_ = %%e') ← infer_type pr,
-                            return (some (e', pr))
+                            return $ some (e', pr)
       | _             := return none
       end)
     | _        := return none
@@ -64,15 +64,15 @@ do e ← whnf_reducible e,
 -- this is private in push_neg for some reason, so we have to redefine it here
 meta def transform_negation : expr → tactic (option (expr × expr))
 | e :=
-do (some (e', pr)) ← transform_negation_step e | return none,
-   (some (e'', pr')) ← transform_negation e' | return (some (e', pr)),
+do some (e',  pr)  ← transform_negation_step e | return none,
+   some (e'', pr') ← transform_negation e' | return $ some (e', pr),
    pr'' ← mk_eq_trans pr pr',
-   return (some (e'', pr''))
+   return $ some (e'', pr'')
 
 end redef
 
 /--
-simplify_top_down but without guard against refl.
+simplify_top_down but without guard against unchanged expressions.
 This is necessary, otherwise the user state doesn't update when the proof is by refl.
 -/
 meta def simplify_top_down' {α} (a : α) (pre : α → expr → tactic (α × expr × expr)) (e : expr) (cfg : simp_config := {}) : tactic (α × expr × expr) :=
@@ -81,6 +81,10 @@ ext_simplify_core a cfg simp_lemmas.mk (λ _, failed)
   (λ _ _ _ _ _, failed)
   `eq e
 
+/--
+Recursively searches all negations in top down order and pushes the n-th found.
+Returns `(e, pr)`, where `e` is the new expression and `pr` is a proof that `old = e`
+-/
 meta def transform_nth_negation (t : expr) (n : ℕ) : tactic (expr × expr) :=
 do (_, e, pr) ← simplify_top_down' (ff, n-1)
                     (λ s e, do
@@ -93,7 +97,7 @@ do (_, e, pr) ← simplify_top_down' (ff, n-1)
                             | some (e, pr) := return ((tt, 0), e, pr)
                             | none         := return ((ff, 0), e, pr)
                             end
-                        | (ff, nat.succ m) := -- encountered less than n-1 negations  
+                        | (ff, nat.succ m) := -- encountered less than n-1 negations
                             match e with
                             | `(¬ %%ne) := return ((ff, m), e, pr)
                             | _         := return ((ff, m+1), e, pr)
@@ -110,8 +114,8 @@ do H ← get_local h,
    skip
 
 meta def push_neg_once_at_goal (n : ℕ) : tactic unit :=
-do H ← target,
-   (e, pr) ← transform_nth_negation H n,
+do t ← target,
+   (e, pr) ← transform_nth_negation t n,
    replace_target e pr
 
 end push_neg_once
