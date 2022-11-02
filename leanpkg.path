@@ -1,5 +1,8 @@
 builtin_path
 path _target/deps/mathlib/src
 path ./src
+<<<<<<< HEAD
 path ./src/lean_src_deaduction_synchro
 path ./snippets/new_exercises_for_testing_deaduction_synchro
+=======
+>>>>>>> e06a752fa59c6b2b3891315bd3aad09cd66b5a79
