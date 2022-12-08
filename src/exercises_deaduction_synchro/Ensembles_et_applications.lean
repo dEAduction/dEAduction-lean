@@ -9,6 +9,7 @@ import tactic
 import structures2      -- hypo_analysis, targets_analysis
 import utils            -- no_meta_vars
 import user_notations   -- notations that can be used in deaduction UI for a new object
+import push_neg_once    -- pushing negation just one step
 
 -- dEAduction definitions
 import set_definitions
@@ -70,7 +71,7 @@ PrettyName
     Equivalence logique
 -/
 begin
-  tautology,
+  exact iff_def,
 end
 
 end logique
@@ -80,8 +81,8 @@ namespace definitions
 PrettyName
     Définitions
 -/
-
 namespace generalites
+
 /- dEAduction
 PrettyName
     Généralités
@@ -834,9 +835,10 @@ begin
     todo
 end
 
+-- NB: naming a bound var with '__' suffix forces use of its name
 lemma exercise.injectivite_categorielle
 (f: Y → Z):
-(injective f) → (∀X: Type, ∀ g h : X → Y, (composition f g) = (composition f h) → g = h)
+(injective f) → (∀X__: Type, ∀ g h : X__ → Y, (composition f g) = (composition f h) → g = h)
 :=
 /- dEAduction
 PrettyName
@@ -917,5 +919,3 @@ end exercices
 end ensembles_et_applications
 
 end course
-
-

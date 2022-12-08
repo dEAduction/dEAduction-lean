@@ -41,16 +41,19 @@ def closed_bra := "¿]"
 
 /- When e is a pi or lambda expr, instanciate e returns
 a local constant a that stands for the first bound variable,
-and the body of a with the free variable replaced by a -/
+and the body of a with the free variable replaced by a.
+The name of 'a' is enriched with suffix 'BoundVar'. -/
 meta def instanciate (e : expr) : tactic (expr × expr) :=
 match e with
 | (pi pp_name binder type body) := do
+    let pp_name := mk_str_name pp_name "BoundVar",
 --    pp_name ← get_unused_name pp_name,      -- does not do the job
     -- trace ("Instantiation name: " ++ to_string pp_name),
     a ← mk_local' pp_name binder type,
     let inst_body := instantiate_var body a,
     return (a , inst_body)
 | (lam pp_name binder type body) := do
+    let pp_name := mk_str_name pp_name "BoundVar", -- trial
 --    pp_name ← get_unused_name pp_name,
     -- trace ("Instantiation name: " ++ to_string pp_name),
     a ← mk_local' pp_name binder type,
@@ -126,23 +129,24 @@ match e with
             is_pro ← tactic.is_prop e,
             if is_pro
                 then return ("PROP_IMPLIES", [type,body])
-                else match e with
-                    | `(%%X → %%Y) := match (X,Y) with
-                        | (`(ℕ), `(ℕ)) := return ("SEQUENCE", [X, Y])
-                        | (`(ℕ), `(ℤ)) := return ("SEQUENCE", [X, Y])
-                        | (`(ℕ), `(ℚ)) := return ("SEQUENCE", [X, Y])
-                        | (`(ℕ), `(ℝ)) := return ("SEQUENCE", [X, Y])
-                        | _ := do X_type ← infer_type X,
-                            match (X_type, Y) with
-                        -- A set family is when source is an index_set
-                        -- (just a type which is "tagged" for serving as index)
-                        -- and target is "set something"
-                            | (`(index_set), `(_root_.set %%Z)) := return ("SET_FAMILY", [X, Z])
-                            | _ := return ("FUNCTION", [X, Y])
-                            end
+            else match e with
+                | `(%%X → %%Y) := match (X,Y) with
+                    -- | (`(ℕ), `(ℕ)) := return ("SEQUENCE", [X, Y])
+                    -- | (`(ℕ), `(ℤ)) := return ("SEQUENCE", [X, Y])
+                    -- | (`(ℕ), `(ℚ)) := return ("SEQUENCE", [X, Y])
+                    -- | (`(ℕ), `(ℝ)) := return ("SEQUENCE", [X, Y])
+                    | (`(ℕ), _) := return ("SEQUENCE", [X, Y])
+                    | _ := do X_type ← infer_type X,
+                        match (X_type, Y) with
+                    -- A set family is when source is an index_set
+                    -- (just a type which is "tagged" for serving as index)
+                    -- and target is "set something"
+                        | (`(index_set), `(_root_.set %%Z)) := return ("SET_FAMILY", [X, Z])
+                        | _ := return ("FUNCTION", [X, Y])
                         end
-                    | _ := return ("ERROR", [])
                     end
+                | _ := return ("ERROR", [])
+                end
         else do
             (var_, inst_body) ← instanciate e,
             return ("QUANT_∀", [type, var_, inst_body])
@@ -428,3 +432,8 @@ end tactic.interactive
 -- begin
 --     hypo_analysis,
 -- end
+
+example (X: Type) (P: X → Prop): ∀ x: X, P x :=
+begin
+    targets_analysis,
+end

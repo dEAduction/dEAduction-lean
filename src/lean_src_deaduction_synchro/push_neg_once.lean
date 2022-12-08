@@ -16,6 +16,14 @@ open tactic expr
 
 namespace push_neg_once
 
+-- theorem not_iff_eq (P Q : Prop) : ¬ (P ↔ Q) = (¬ (P → Q) ∨ ¬ (Q → P))
+--  := 
+-- begin
+--   sorry
+-- --  rw not_and_distrib,
+-- --  (not_and_distrib (iff_def P Q))
+-- end
+
 section redef
 open push_neg -- we don't want to pollute the namespace outside of this definition
 
@@ -27,10 +35,13 @@ do e ← whnf_reducible e,
    | `(¬ %%ne) :=
       (do ne ← whnf_reducible ne,
       match ne with
+      -- | `(%%a ↔ %%b)  := do e ← to_expr ``(¬ (%%a → %%b) ∨ ¬ (%%b → %%a)),
+      --                       pr ← mk_app ``not_iff_eq [a, b],
+      --                       return $ some (e, pr)
       | `(¬ %%a)      := do pr ← mk_app ``not_not_eq [a],
                             return $ some (a, pr)
       | `(%%a ∧ %%b)  := do pr ← mk_app ``not_and_eq [a, b],
-                            return $ some (`((%%a : Prop) → ¬ %%b), pr)
+                            return (some (`(¬ %%a ∨ ¬ %%b), pr))
       | `(%%a ∨ %%b)  := do pr ← mk_app ``not_or_eq [a, b],
                             return $ some (`(¬ %%a ∧ ¬ %%b), pr)
       | `(%%a ≤ %%b)  := do e ← to_expr ``(%%b < %%a),

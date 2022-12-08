@@ -22,7 +22,7 @@ import compute
 import push_neg_once    -- pushing negation just one step
 
 -- dEAduction definitions
--- import set_definitions
+import set_definitions
 import real_definitions
 
 
@@ -127,7 +127,9 @@ variables {RealSubGroup : Type} [decidable_linear_order RealSubGroup]
 lemma theorem.ppe_max_gauche :
 ∀ a b : RealSubGroup, a ≤ max a b :=
 begin
+  targets_analysis,
   intros a b,
+  hypo_analysis,
   norm_num, tautology,
   --exact le_max_left a b,
 end
@@ -370,49 +372,12 @@ open definitions
 --------------------------------------------------
 namespace exemples
 
-lemma exercise.ex_non_cv :
-¬ (convergente (λ n, (-1)^n))
-:=
-/- dEAduction
-PrettyName
-  Un exemple de suite non convergente
--/
-begin
-  rw suites.definition.convergente, simp only [],
-  todo
-end
-
-lemma exercise.ex_cv :
-convergente (λ n, (1/n^2))
-:=
-/- dEAduction
-PrettyName
-  Un exemple de suite convergente
--/
-begin
-  todo
-end
-
-lemma exercise.ex_dv :
-limit_plus_infinity (λ n, (real.sqrt (n+2)))
-:=
-/- dEAduction
-PrettyName
-  Un exemple de suite divergente
--/
-begin
-  todo
-end
-
-
-
-
 lemma exercise.limit_constante 
 (u : ℕ → ℝ) (c : ℝ) (H : ∀ n, u n = c) :
 limit u c :=
 /- dEAduction
 PrettyName
-  La limite d'une suite constante
+  La limite d'une suite constante !
 -/
 begin
 --   rw definition.limit,
@@ -439,7 +404,7 @@ l = l'
 :=
 /- dEAduction
 PrettyName
-  Unicité de la limite
+  Unicité de la limite (**)
 -/
 begin
   -- by_contradiction,
@@ -466,43 +431,33 @@ begin
 end
 
 
-lemma exercise.def_alt
+lemma exercise.couper_epsilon_en_deux
 (u : ℕ → ℝ) (l : ℝ) :
 (limit u l) ↔ 
-∀ ε > 0, ∃ N, ∀ n ≥ N, | u n - l | ≤ ε
+∀ ε > 0, ∃ N, ∀ n ≥ N, | u n - l | < 2*ε
 :=
 /- dEAduction
 PrettyName
-  Définition alternative de la limite
+  Couper les epsilons en deux
 -/
 begin
-  -- split,
-  -- intro H1,
-  -- intro ε, intro H2,
-  -- rw limit at H1,
-  -- have H3 := H1 ε H2,
-  -- cases H3 with n H4,
-  -- use n,
-  -- intro n', intro H5,
-  -- have H6 := H4 n' H5,
-  -- -- solve1 {linarith},
-  -- todo,
   todo,
 end
 
 
-lemma exercise.limit_infinity_alt
-{u : ℕ → ℝ} {l : ℝ} :
-(limit_plus_infinity u) ↔ 
-∀ M>0, ∃ N, ∀ n ≥ N, u n > M
-:= 
+lemma exercise.couper_epsilon_en_100
+(u : ℕ → ℝ) (l : ℝ) :
+(limit u l) ↔ 
+∀ ε > 0, ∃ N, ∀ n ≥ N, | u n - l | < 100*ε
+:=
 /- dEAduction
 PrettyName
-  Définition alternative pour une limite infinie
+  Couper les epsilons en cent !
 -/
 begin
-  todo
+  todo,
 end
+
 
 end premieres_proprietes
 
@@ -512,6 +467,19 @@ namespace proprietes
 PrettyName
   Propriétés
 -/
+
+lemma exercise.limite_positive
+(u : ℕ → ℝ) (l : ℝ) (H : limit u l)
+(H' : l >0) :
+∃ N, ∀ n ≥ N, u n > 0
+:=
+/- dEAduction
+PrettyName
+  Suite dont la limite est strictement positive
+-/
+begin
+  todo
+end
 
 lemma exercise.limite_somme
 (u v: ℕ → ℝ) (l l' : ℝ) (H : limit u l)
@@ -556,6 +524,19 @@ begin
   -- linarith only [Hb, Hc, Hd],
 end
 
+
+lemma exercise.borne_fois_zero
+(u v: ℕ → ℝ) (l : ℝ) (H : limit u l)
+(H' : bounded_sequence v) :
+limit (λn, (u n) * (v n)) 0
+:=
+/- dEAduction
+PrettyName
+  Limite d'un produit (cas particulier)
+-/
+begin
+  todo
+end
 
 lemma exercise.limite_inegalites
 (u v: ℕ → ℝ) (l l' : ℝ) (H : limit u l)
@@ -604,29 +585,15 @@ begin
   todo
 end
 
--- Let's make a new definition.
-definition is_bounded (a : ℕ → ℝ) := ∃ B, ∀ n, |a n| ≤ B
-
--- Now try this:
-lemma tendsto_bounded_mul_zero {a : ℕ → ℝ} {b : ℕ → ℝ}
-  (hA : is_bounded a) (hB : limit b 0) 
-  : limit (λ n, (a n) * (b n)) 0 :=
-begin
-  todo,
-end
 
 /-
 A essayer : appliquer somme, CV implique borné, borné x 0
 -/
-lemma exercise.limite_produit
+lemma limite_produit
 (u u': ℕ → ℝ) (l l' : ℝ) (H : limit u l)
 (H' : limit u' l') :
 limit (λn, (u n) * (u' n)) (l*l')
 :=
-/- dEAduction
-PrettyName
-  Limite d'un produit
--/
 begin
   todo
 end
@@ -645,6 +612,42 @@ PrettyName
 
 open definitions
 
+namespace composition
+
+open set
+
+lemma definition.composition {X Y Z: Type} {f: X → Y} {g:Y → Z} {x:X}:
+composition g f x = g (f x)
+:=
+begin
+    todo,
+end
+
+lemma exercise.composition_limite_fonction
+(f: ℝ → ℝ) (g: ℝ → ℝ) (a b c : ℝ)
+(H0: limit_function f a b) (H1: limit_function g b c):
+limit_function (composition f g) a c :=
+/- dEAduction
+PrettyName
+  Continuité et composition
+-/
+begin
+  todo
+end
+
+
+lemma exercise.composition_continuite (f: ℝ → ℝ) (g: ℝ → ℝ)
+(H: continuous f) (H': continuous g):
+continuous (g ∘ f) :=
+/- dEAduction
+PrettyName
+  Continuité et composition
+-/
+begin 
+  todo
+end
+
+
 lemma exercise.image_convergente (u: ℕ → ℝ) (l : ℝ) (f: ℝ → ℝ)
 (H: limit u l) (H': continuous f):
 limit (λ n, f (u n)) (f l) :=
@@ -656,14 +659,57 @@ begin
   todo
 end
 
-end exercices_fonctions
+end composition
 
+namespace DL
+/- dEAduction
+PrettyName
+  Développements limités
+-/
 
+definition DL_order_0 (f: ℝ → ℝ) : Prop :=
+∃ (φ : ℝ → ℝ), (limit_function φ 0 0) and 
+(∀ h, f h = f 0 + φ h)
 
-example (X: Type) (A: set X) (a:X) (P: X → Prop) : ∃ x ∈ A, P(x) :=
+definition DL_order_1 (f: ℝ → ℝ) (a : ℝ) : Prop :=
+∃ (φ : ℝ → ℝ), (limit_function φ 0 0) and 
+(∀ h, f h = f 0 + a * h + (φ h) * h)
+
+lemma definition.DL_order_0
+(f: ℝ → ℝ) (a : ℝ):
+(DL_order_0 f) ↔ (∃ (φ : ℝ → ℝ), (limit_function φ 0 0) and 
+(∀ h, f h = f 0 + φ h))
+:=
 begin
   todo
 end
+
+lemma exercise.DL_et_limite
+(f: ℝ → ℝ):
+(DL_order_0 f) ↔ ∃ l, (limit_function f 0 l) :=
+/- dEAduction
+PrettyName
+  Développement limité et limite
+-/
+begin
+  todo
+end
+
+
+
+end DL
+
+end exercices_fonctions
+
+
+/- 
+On peut multiplier les variantes : si une fonction a une
+limite >0 en un point, elle est >0 au voisinage.
+Si lim f < lim g alors f < g au voisinage.
+
+Signe à partir d'un DL !
+
+-/
 
 
 end course

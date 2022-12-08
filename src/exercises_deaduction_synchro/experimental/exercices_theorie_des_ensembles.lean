@@ -9,6 +9,7 @@ import tactic
 import structures2      -- hypo_analysis, targets_analysis
 import utils            -- no_meta_vars
 import user_notations   -- notations that can be used in deaduction UI for a new object
+import push_neg_once
 
 -- dEAduction definitions
 import set_definitions
@@ -417,7 +418,7 @@ lemma exercise.produit_avec_intersection
 set.prod A (B ∩ C) = (set.prod A B) ∩ (set.prod A C)
 :=
 begin
-    todo
+    todo,
 end
 
 
@@ -1036,6 +1037,8 @@ PrettyName
 -/
 begin
     todo
+    -- use complement A, 
+    -- norm_num,
 end
 
 lemma exercise.difference_symetrique_6
