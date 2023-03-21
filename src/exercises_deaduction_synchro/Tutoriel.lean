@@ -71,7 +71,7 @@ ImplicitUse
     True
 -/
 begin
-    exact iff.rfl
+    exact iff.rfl,
 end
 
 lemma definition.egalite_deux_ensembles {A A' : set X} :
@@ -83,7 +83,7 @@ ImplicitUse
     False
 -/
 begin
-     exact set.ext_iff
+     exact set.ext_iff,
 end
 
 
@@ -114,7 +114,7 @@ ImplicitUse
     True
 -/
 begin
-    exact iff.rfl
+    exact iff.rfl,
 end
 
 lemma definition.union_deux_ensembles  {A : set X} {B : set X} {x : X} :
@@ -126,7 +126,7 @@ ImplicitUse
     True
 -/
 begin
-    exact iff.rfl
+    exact iff.rfl,
 end
 
 end unions_intersections
@@ -155,7 +155,7 @@ Description
     Voici un premier exercice !
 -/
 begin
-    todo
+    todo,
 end
 
 
@@ -170,7 +170,7 @@ Description
     Voici un deuxième exercice !
 -/
 begin
-    todo
+    todo,
 end
 
 lemma exercise.inclusion_transitive
@@ -184,7 +184,7 @@ Description
     Voici un troisième exercice !
 -/
 begin
-    todo
+    todo,
 end
 
 lemma exercise.ensemble_inclus_union
@@ -198,7 +198,7 @@ Description
     Le bouton ∨ ("ou"), permet notamment de montrer un but de la forme "P ou Q" en choisissant si on veut montrer "P" ou "Q".
 -/
 begin
-    todo
+    todo,
 end
 
 lemma exercise.ensemble_inclus_intersection
@@ -209,10 +209,11 @@ A ⊆ A ∩ B  → (A ∪ B) = B
 PrettyName
     Ensemble inclus dans l'intersection
 Description
+    Utilisez la double inclusion pour montrer une égalité entre ensembles.
     Le bouton ∨ ("ou") permet également, appliqué à une hypothèse du type "P ou Q" de faire une disjonction de cas selon si on a "P" ou "Q".
 -/
 begin
-    todo
+    todo,
 end
 
 lemma exercise.inter_distributive_union
@@ -223,10 +224,10 @@ A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C)
 PrettyName
     Union avec une intersection
 Description
-    Le bouton ↔ (équivalence), permet notamment de scinder "P ↔ Q" en deux implications "P → Q" et "Q → P".
+    Utilisez l'aperçu de preuve pour ne pas vous perdre dans les différents cas.
 -/
 begin
-    todo
+    todo,
 end
 
 lemma exercise.exercice_bilan
@@ -236,6 +237,8 @@ A ⊆ B ↔ A ∩ B = A
 /- dEAduction
 PrettyName
     Exercice bilan
+Description
+    On peut utiliser une égalité pour remplacer l'un des termes par l'autre.
 -/
 begin
     todo

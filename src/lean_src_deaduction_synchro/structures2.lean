@@ -271,30 +271,30 @@ private meta def analysis_rec_with_types : expr →  tactic string
 | e :=
 do ⟨string, list_expr⟩ ←  analysis_expr_step(e),
     -- trace ("analysing e: " ++ to_string e),
-    if is_local_constant e
-        then return(string)
-        else do
-    e_type ← infer_type e,
-    -- trace "analysing e_type",
-    string_type ← analysis_rec e_type,
-    let str_with_type := string ++ open_bra ++ "type: " ++ string_type ++ closed_bra,
-    -- trace str_with_type,
-    match list_expr with
-    -- BEWARE, case of more than three arguments not implemented
-    -- replace by a list.map
-    |[e1] :=  do
-       string1 ← analysis_rec_with_types e1,
-       return(str_with_type ++ open_paren ++ string1 ++ closed_paren)
-    |[e1,e2] :=  do
-        string1 ← analysis_rec_with_types e1,
-        string2 ← analysis_rec_with_types e2,
-        return (str_with_type ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ closed_paren)
-    |[e1,e2,e3] :=  do
-        string1 ← analysis_rec_with_types e1,
-        string2 ← analysis_rec_with_types e2,
-        string3 ← analysis_rec_with_types e3,
-        return (str_with_type ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ separator_comma ++ string3 ++ closed_paren)
-    | _ :=    return(str_with_type)
+    -- if is_local_constant e
+    --     then return(string)
+    --     else do
+        e_type ← infer_type e,
+        -- trace "analysing e_type",
+        string_type ← analysis_rec e_type,
+        let str_with_type := string ++ open_bra ++ "type: " ++ string_type ++ closed_bra,
+        -- trace str_with_type,
+        match list_expr with
+        -- BEWARE, case of more than three arguments not implemented
+        -- replace by a list.map
+            |[e1] :=  do
+            string1 ← analysis_rec_with_types e1,
+            return(str_with_type ++ open_paren ++ string1 ++ closed_paren)
+            |[e1,e2] :=  do
+                string1 ← analysis_rec_with_types e1,
+                string2 ← analysis_rec_with_types e2,
+                return (str_with_type ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ closed_paren)
+            |[e1,e2,e3] :=  do
+                string1 ← analysis_rec_with_types e1,
+                string2 ← analysis_rec_with_types e2,
+                string3 ← analysis_rec_with_types e3,
+                return (str_with_type ++ open_paren ++ string1 ++ separator_comma ++ string2 ++ separator_comma ++ string3 ++ closed_paren)
+            | _ :=    return(str_with_type)
     end
 
 -- set_option pp.all true
@@ -395,7 +395,7 @@ private meta def analyse_expr_brut : expr →  tactic string
             return(S3)
         else  do let S0 := "OBJET : ",
             let S1 :=  to_string e,
-            S2 ← analyse_rec_brut expr_t,
+            S2 ← analyse_rec_brut e,
             let S3 := S0 ++ S1 ++ " : "++ S2,
             return(S3)
 
@@ -433,7 +433,4 @@ end tactic.interactive
 --     hypo_analysis,
 -- end
 
-example (X: Type) (P: X → Prop): ∀ x: X, P x :=
-begin
-    targets_analysis,
-end
+
