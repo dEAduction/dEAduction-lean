@@ -20,16 +20,13 @@ import set_definitions
 -------------------------
 /- dEAduction
 Title
-    Ensembles et applications
+    Arithmétique
 Author
-    Frédéric Le Roux, Camille Lichère, Zoé Mesnil
+    Frédéric Le Roux, Thomas Richard
 Institution
     Université du monde
 Description
-    Ce fichier contient une série d'exercices concernant les opérations ensemblistes
-    préservées par image directe ou réciproque par une application.
-    ATTENTION, certains énoncés sont faux ! Si vous n'arrivez pas à démontrer un énoncé, 
-    cherchez un contre-exemple...
+    Premier essai d'arithmétique
 -/
 
 local attribute [instance] classical.prop_decidable
@@ -55,11 +52,19 @@ def pair (a: ℕ) := ∃ b, a = 2*b
 def divise (a b:ℕ) := ∃ c, b = a * c
 
 lemma definition.pair {a:ℕ} : (pair a) ↔ ∃ b, a = 2*b :=
+/- dEAduction
+ImplicitUse
+  True
+-/
 begin
   refl
 end
 
 lemma definition.divise {a b : ℕ} : (divise a b) ↔ (∃ c, b = a * c) :=
+/- dEAduction
+ImplicitUse
+  True
+-/
 begin
   refl
 end
