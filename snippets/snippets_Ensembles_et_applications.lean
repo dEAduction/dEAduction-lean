@@ -150,7 +150,7 @@ end
 
 lemma definition.paire
 {x x_0 x_1: X} :
-(x ∈ ({x_0, x_1}:set X) ) ↔ (x=x_0 ∨ x=x_1)
+(x ∈ (pair x_0 x_1) ) ↔ (x=x_0 ∨ x=x_1)
 :=
 begin
     refl,
@@ -236,14 +236,24 @@ begin
     todo
 end
 
--- lemma toto :
--- ∀ f: X→Y, ∀{A: set X}, ∀{x: X},
---  (x ∈ A → f x ∈ f '' A)
--- :=
--- begin
---     intros f A x H,
---     have H' := @exercise.image_directe _ _ f A x,
--- end
+example (g: X → Y) (B: set X) (y: X) : true :=
+begin
+ have H1: ∀{A: set X}, ∀{x: X},
+ (x ∈ A → g x ∈ g '' A), -- intros A X,
+ apply exercise.image_directe,
+
+have H2:  ∀{x: X},
+ (x ∈ B → g x ∈ g '' B),
+ apply exercise.image_directe,
+ 
+have H3:  ∀{A: set X},
+ (y ∈ A → g y ∈ g '' A),
+intro A, apply exercise.image_directe, 
+  
+have H4 := @exercise.image_directe _ _ g B,
+
+end
+
 
 lemma definition.image_reciproque {x:X} :
 x ∈ f  ⁻¹' B ↔ f(x) ∈ B
@@ -369,6 +379,7 @@ PrettyName
     Image directe par une composition
 -/
 begin
+  -- hypo_analysis,
     todo
 end
 

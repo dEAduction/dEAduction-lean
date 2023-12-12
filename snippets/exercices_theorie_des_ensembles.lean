@@ -69,7 +69,7 @@ PrettyName
 ------------------------
 -- COURSE DEFINITIONS --
 ------------------------
-lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, (x ∈ A) → x ∈ B :=
+lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
 /- dEAduction
 ImplicitUse
     True
@@ -347,9 +347,31 @@ Description
     Le complémentaire d'une réunion quelconque égale l'intersection des complémentaires
 -/
 begin
+    hypo_analysis,
     todo
 end
 
+example
+ (X: Type) (I: index_set) (E: I → set (X))  :
+ set.compl (set.Union(λ (a: I), E a)) = set.Inter(λ (a: I), set.compl (E a)) :=
+begin
+rw theorie_des_ensembles.generalites.definition.double_inclusion, split, no_meta_vars,
+    targets_analysis,
+    all_goals {hypo_analysis},
+end
+end complementaire
+end theorie_des_ensembles
+end course
+
+
+example
+ (X: Type) (I: index_set) (E: I → set (X))  :
+ set.compl (set.Union(λ (i: I), E i)) = set.Inter(λ (i: I), set.compl (E i)) :=
+begin
+rw theorie_des_ensembles.generalites.definition.double_inclusion, split, no_meta_vars,
+    targets_analysis,
+    all_goals {hypo_analysis},
+end
 
 lemma exercise.inclusion_complement_I :
 A ⊆ B → set.compl B ⊆ set.compl A
@@ -460,7 +482,7 @@ PrettyName
     Définitions
 -/
 
-lemma definition.image_directe (y : Y) :  y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
+lemma definition.image_directe (y : Y) : y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
 begin
     todo
 end
@@ -605,7 +627,7 @@ begin
     todo
 end
 
-lemma exercise.image_reciproque.composition
+lemma exercices.image_reciproque.composition
 (C: set Z)
 :
 ((composition g f) )⁻¹' C = f ⁻¹' (g ⁻¹' C)
@@ -1171,7 +1193,12 @@ PrettyName
 begin
     todo
 end
+example
+ (X: Type) (I: Type) (E: I → set (X))  :
+ set.compl (set.Union(λ (i: I), E i)) = set.Inter(λ (i: I), set.compl (E i)) :=
+begin
 
+end
 end applications
 
 

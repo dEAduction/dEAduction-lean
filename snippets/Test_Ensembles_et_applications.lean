@@ -91,7 +91,7 @@ PrettyName
 lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
 /- dEAduction
 ImplicitUse
-  True
+    True
 -/
 begin
     exact iff.rfl
@@ -108,13 +108,13 @@ begin
 end
 
 -- Unfortunately split cannot work
-lemma definition.double_inclusion {A A' : set X} :
+lemma definition.double_inclusion (A A' : set X) :
 A = A' ↔ (A ⊆ A' ∧ A' ⊆ A) :=
 /- dEAduction
 PrettyName
     Double inclusion
 ImplicitUse
-  True
+    True
 -/
 begin
     exact set.subset.antisymm_iff
@@ -129,7 +129,7 @@ begin
 end
 
 lemma definition.ensemble_non_vide
-{A: set X} :
+(A: set X) :
 (A ≠ ∅) ↔ ∃ x : X, x ∈ A
 :=
 /- dEAduction
@@ -142,7 +142,7 @@ end
 
 lemma definition.singleton
 {x x_0: X} :
-x ∈ ({x_0}:set X) ↔ x=x_0
+(x ∈  (sing x_0) ) ↔ x=x_0
 :=
 begin
     refl,
@@ -150,7 +150,7 @@ end
 
 lemma definition.paire
 {x x_0 x_1: X} :
-(x ∈ ({x_0, x_1}:set X) ) ↔ (x=x_0 ∨ x=x_1)
+(x ∈ (pair x_0 x_1) ) ↔ (x=x_0 ∨ x=x_1)
 :=
 begin
     refl,
@@ -199,7 +199,7 @@ namespace applications
 variables  {A A': set X}
 variables {f: X → Y} {B B': set Y}
 
-lemma definition.egalite_fonctions {f' : X → Y} :
+lemma definition.egalite_fonctions (f' : X → Y) :
 f = f' ↔ ∀ x, f x = f' x :=
 /- dEAduction
 PrettyName
@@ -210,7 +210,7 @@ begin
 end
 
 
-lemma definition.identite {f₀: X → X} :
+lemma definition.identite (f₀: X → X) :
 f₀ = Identite ↔ ∀ x, f₀ x = x :=
 /- dEAduction
 PrettyName
@@ -221,7 +221,7 @@ begin
 end
 
 
-lemma definition.image_directe {y : Y} :
+lemma definition.image_directe (y : Y) :
 y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y
 :=
 begin
@@ -236,23 +236,14 @@ begin
     todo
 end
 
--- lemma toto :
--- ∀ f: X→Y, ∀{A: set X}, ∀{x: X},
---  (x ∈ A → f x ∈ f '' A)
--- :=
--- begin
---     intros f A x H,
---     have H' := @exercise.image_directe _ _ f A x,
--- end
-
-lemma definition.image_reciproque {x:X} :
+lemma definition.image_reciproque (x:X) :
 x ∈ f  ⁻¹' B ↔ f(x) ∈ B
 :=
 begin
     todo
 end
 
-variables (g : Y → Z)
+variables {g : Y → Z}
 
 lemma definition.composition {x:X}:
 composition g f x = g (f x)
@@ -262,7 +253,7 @@ begin
 end
 
 lemma definition.injectivite :
-injective f ↔ ∀ {x x' : X}, (f x = f x' → x = x')
+injective f ↔ ∀ x x' : X, (f x = f x' → x = x')
 :=
 /- dEAduction
 PrettyName
@@ -289,7 +280,7 @@ end
 
 lemma theorem.image_singleton :
 ∀ {f: X→Y}, ∀{x_0: X},
- f '' {x_0} = {f(x_0)}
+ f '' (sing x_0) = sing (f(x_0))
 :=
 /- dEAduction
 PrettyName
@@ -361,7 +352,7 @@ ANCIEN SCHEMA :
 namespace composition_et_images
 
 lemma exercise.composition_image_directe
-{A: set X} : 
+(A: set X) : 
 (composition g f) '' A = g '' (f '' A)
 :=
 /- dEAduction
@@ -369,12 +360,16 @@ PrettyName
     Image directe par une composition
 -/
 begin
+    -- rw definitions.generalites.definition.double_inclusion,
+    -- split,
+    -- targets_analysis,
+    -- all_goals {hypo_analysis}
     todo
 end
 
 
 lemma exercise.composition_image_reciproque
-{C: set Z} : 
+(C: set Z) : 
 (composition g f) ⁻¹' C = f ⁻¹' (g ⁻¹' C)
 :=
 /- dEAduction
@@ -382,7 +377,9 @@ PrettyName
     Image réciproque par une composition
 -/
 begin
-    todo
+    refl,
+    targets_analysis,
+    all_goals {hypo_analysis},
 end
 
 end composition_et_images
@@ -542,6 +539,7 @@ PrettyName
 -/
 
 lemma exercise.composition_injections
+(z: Z)
 (H1 : injective f) (H2 : injective g)
 :
 injective (composition g f)
@@ -550,9 +548,24 @@ injective (composition g f)
 PrettyName
     Composition d'injections
 -/
-begin
-    todo
+begin 
+    intros x y H,
+    rw definitions.applications.definition.composition at H,
+    rw definitions.applications.definition.composition at H,
+    -- conv at H
+    -- begin
+    --   to_lhs,
+    --   -- rw ← definitions.applications.definition.composition,
+    -- end
+    -- rw ← definitions.applications.definition.composition at H,
+    -- have Haux := @definitions.applications.definition.composition,
+    have H2 : g (f x) = z,
+    simp only [← definitions.applications.definition.composition] at H2,
+
 end
+
+variable x:X
+#check definitions.applications.definition.composition 
 
 lemma exercise.composition_surjections
 (H1 : surjective f) (H2 : surjective g) :
@@ -645,12 +658,6 @@ PrettyName
   Image directe et intersection (ii)
 -/
 begin
-  -- intros A B y H,
-  -- cases H with HA HB,
-  -- rw definitions.applications.definition.image_directe at HA HB,
-  -- cases HA with x,
-  -- cases HB with x,
-  -- have H: ∃ x: X, ∀ x: Y, x =x ,
   todo
 end
 
@@ -763,29 +770,20 @@ AvailableTheorems
   UNTIL_NOW
 -/
 begin
-  -- todo
   intro f,
-contrapose,
 intro H1,
-push_neg_once, simp only [ne.def],
-rw ensembles_et_applications.definitions.applications.definition.injectivite at H1,
-push_neg_once at H1,
-cases H1 with x H2,
-push_neg_once at H2,
-cases H2 with y H4,
-push_neg_once at H4, simp only [ne.def] at H4,
-cases H4 with H6 H7,
-use ({x}),
-rw ensembles_et_applications.definitions.generalites.definition.double_inclusion,
-push_neg_once,
-right,
-rw ensembles_et_applications.definitions.generalites.definition.inclusion,
-push_neg_once,
-push_neg_once,
-use (y),
-split,
+rw ensembles_et_applications.definitions.applications.definition.injectivite, intro x, no_meta_vars,
+intro y,
+intro H2,
+have H3 := H1 (sing x),
+-- have H3 := H1 {x},
+rw ensembles_et_applications.definitions.generalites.definition.double_inclusion at H3,
+cases H3 with H4 H5,
+have H6 := @H5 y,
+have H7: (y ∈ f ⁻¹' (f '' (sing x))),
 rw ensembles_et_applications.definitions.applications.definition.image_reciproque,
-rw definitions.applications.theorem.image_singleton,
+rw ensembles_et_applications.definitions.applications.theorem.image_singleton,
+
 end
 
 lemma exercise.caracterisation_surjectivite :
@@ -944,6 +942,20 @@ PrettyName
   Image réciproque et inclusion (iii)
 -/
 begin
+intro H1,
+intro A,
+intro B,
+intro H2,
+rw ensembles_et_applications.definitions.generalites.definition.inclusion, intro y, no_meta_vars,
+intro H3,
+rw ensembles_et_applications.definitions.generalites.definition.inclusion at H2, skip,
+simp_rw ensembles_et_applications.definitions.applications.definition.image_reciproque at H2, skip,
+have H4 := H1 y,
+cases H4 with x H5,
+rw H5 at H3,
+-- hypo_analysis2 1,
+have H7 := @H2 _ H3,
+
   -- intros surj_f A B incl y y_dans_A,
   -- have ex_x := surj_f y, cases ex_x with x eq,
   -- have but: (x dans (set.preimage f A)),
@@ -959,7 +971,6 @@ example
 :=
 begin
   push_neg,
-  todo
 end
 
 end exercices
