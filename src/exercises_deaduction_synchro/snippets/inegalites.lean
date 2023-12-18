@@ -252,7 +252,9 @@ lemma exercise.inegalites_1
 x + t < y + z :=
 
 begin
-  todo
+  let x0 := ((123): @real), have H0: x0 = ((123): @real), refl,
+  smart_add H1_lt x0 with H1, rw H0 at H1,clear H0, clear x0,
+
 end
 
 -- lemma exercise.simp0
@@ -343,5 +345,4 @@ end
 end tests_inegalites
 
 end course
-
 

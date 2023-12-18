@@ -1,5 +1,3 @@
-
-
 -- import data.set
 import tactic
 
@@ -7,6 +5,8 @@ import tactic
 import structures2
 import user_notations
 import utils
+import push_neg_once
+
 
 -- General principles :
 -- Type should be defined as parameters, in order to be implicit everywhere
@@ -65,6 +65,8 @@ notation [parsing_only]  P ` ssi ` Q := P ↔ Q
 notation [parsing_only]  x ` dans ` A := x ∈ A
 notation [parsing_only]  x ` appartient ` A := x ∈ A
 notation [parsing_only]  A ` inter ` B := A ∩ B
+
+
 notation [parsing_only]  A ` intersection ` B := A ∩ B
 notation [parsing_only]  A ` union ` B := A ∪ B
 notation [parsing_only]  A ` inclus ` B := A ⊆ B
@@ -97,6 +99,10 @@ PrettyName
 -- COURSE DEFINITIONS --
 ------------------------
 lemma definition.inclusion {A B : set X} : A ⊆ B ↔ ∀ {x:X}, x ∈ A → x ∈ B :=
+/- dEAduction
+ImplicitUse
+    True
+-/
 begin
     exact iff.rfl
 end
@@ -147,25 +153,10 @@ PrettyName
     Double inclusion
 -/
 begin
-    exact set.subset.antisymm_iff.mpr
+    exact set.subset.antisymm_iff.mpr  
 end
 
-variables (A: set X) (f: X → Y) (B: set Y)
-lemma definition.image_directe (y: Y) : y ∈ f '' A ↔ ∃ x : X, x ∈ A ∧  f x = y :=
-begin
-    todo
-end
-
-lemma theorem.image_directe (x: X) : x ∈ A → f(x) ∈ f '' A :=
-begin
-    todo
-end
-
-lemma definition.image_reciproque (x: X) : x ∈ f ⁻¹' B ↔ f x ∈ B :=
-begin
-    todo
-end
-lemma exercise.inclusion_transitive
+lemma exercise.test_implicit_inclusion
 (A B C : set X) :
 (A ⊆ B ∧ B ⊆ C) → A ⊆ C
 :=
@@ -173,108 +164,141 @@ lemma exercise.inclusion_transitive
 PrettyName
     Transitivité de l'inclusion
 AutoTest
-    →, definition.inclusion, ∀, →,
-    @P1 ∧,
-    @P2 @P3 definition.inclusion,
-    @P1 @P2 →,
-    @P4 @P3 →,
-    CQFD
+    →, @P1 ∧, ∀, →,
+    @P3 @P1 →, @P4 @P2 →,
+    CQFD 
 -/
 begin
-    intro H1,
-    rw definition.inclusion,
-    intros x H2,
-    cases H1 with H3 H4,
-    rw definition.inclusion at H3 H4,
-    have H5 := H3 H2,
-    have H6 := H4 H5,
-    assumption,
+    todo
 end
 
 example (x y:X) (H : x ≠ y) : y ≠ x :=  
 begin
-    apply ne.symm, assumption,
+    apply ne.symm,
+    assumption,
 end
  
 end generalites
 
 
-namespace tests_statements
 
+---------------------------
+--- TESTS PROOF BUTTONS ---
+---------------------------
+namespace tests_proof_buttons
 
-lemma exercise.test_definition
-(A B : set X)  (H1: A ⊆ B) :
-A ⊆ B 
-:=
+-------------------
+-- Proof methods --
+-------------------
+
+-- Case base reasoning --
+lemma exercise.test_case_base_reasoning
+(P: Prop):
+P ∨ ¬ P :=
 /- dEAduction
 AutoTest
-    H1 definition.inclusion success=H1,
-    definition.inclusion success=appliquée_au_but,
+    proof_methods 0 P,
+    ∨ 0, CQFD,
+    ∨ 1, CQFD
+-/
+begin
+    todo
+end
+
+lemma exercise.test_case_base_reasoning_2
+(P Q : Prop) (H1: P ∨ Q):
+P ∨ Q :=
+/- dEAduction
+AutoTest
+    H1 proof_methods 0,
+    ∨ 0,
+    CQFD,
+    ∨ 1,
     CQFD
 -/
 begin
   todo
 end
 
-lemma exercise.test_theorem_target_1
-(A A' : set X) (H1: (A ⊆ A' ∧ A' ⊆ A)): 
-A = A' 
-:=
+lemma exercise.test_contrapose
+(P Q : Prop) (H1: ¬ Q → ¬ P):
+P → Q :=
 /- dEAduction
 AutoTest
-    target theorem.double_inclusion success=but_a_été_remplacé,
+    proof_methods 1,
     CQFD
 -/
 begin
   todo
 end
 
-
-lemma exercise.test_theorem_hypo
-(A A' : set X) (H1: (A ⊆ A' ∧ A' ⊆ A)): 
-A = A' 
-:=
+lemma exercise.test_absurdum
+(P: Prop) (H1: P):
+P :=
 /- dEAduction
 AutoTest
-    H1 theorem.double_inclusion success=Théorème_appliqué,
+    proof_methods 2,
     CQFD
 -/
 begin
   todo
 end
 
--- Here we test that deaduction is not too powerfull, i.e. theorem.image_directe should NOT solve the goal
--- (as the Lean `apply` tactic does, by unfolding the semi-reducible definition of inverse image)
--- deaduction does not send the code `apply`, but `apply_with ... {md:=reducible}`)
--- PB = il faut maintenant sélectionner le but
--- lemma exercise.test_theorem_target_2
--- (x: X) (A: set X) (f: X → Y) (H: x ∈ A): 
--- x ∈ f ⁻¹' (f '' A)
--- :=
--- /- dEAduction
--- AutoTest
---     theorem.image_directe success=Théorème_ajouté_au_contexte,
--- -/
--- begin
---   todo
--- end
- 
--- lemma exercise.test_theorem_target_3
--- (x: X) (A: set X) (f: X → Y) (H: x ∈ A): 
--- x ∈ f ⁻¹' (f '' A)
--- :=
--- /- dEAduction
--- AutoTest
---     definition.image_reciproque,
---     theorem.image_directe success=Théorème_appliqué,
---     CQFD
--- -/
--- begin
---   todo
--- end
+lemma exercise.test_sorry
+(P: Prop):
+P :=
+/- dEAduction
+AutoTest
+    proof_methods 3
+-/
+begin
+  todo
+end
 
+-----------------
+-- Now objects --
+-----------------
 
-end tests_statements
+lemma exercise.test_introduce_new_object
+(x: X):
+∃ y: X, y=x
+:=
+/- dEAduction
+AutoTest
+    new_object 0 z [ x ],
+    ∃ z
+-/
+begin
+  todo
+end
+
+-- Don't know how to test this one!!
+lemma exercise.test_introduce_new_subgoal
+(P Q R: Prop) (H1: Q) :
+(P ∨ Q) ∨ R
+:=
+/- dEAduction
+AutoTest
+    new_object 1 [ P__∨__Q ],
+    ∨ 1, CQFD, CQFD
+-/
+begin
+  todo
+end
+
+lemma exercise.test_introduce_new_function
+(P: X × Y → Prop) (H: ∀ x:X, ∃ y:Y, P(x,y)):
+∃ g: (X → Y), ∀ x:X, P(x,g(x)) :=
+/- dEAduction
+AutoTest
+    H new_object 2,
+    @O4 ∃,
+    CQFD
+-/
+begin
+  todo
+end
+end tests_proof_buttons
 end theorie_des_ensembles
 end course
 

@@ -2,20 +2,19 @@
 This is a d∃∀duction file providing exercises for sets and maps. French version.
 -/
 
+-- Standard Lean import
 import data.set
 import tactic
 import data.nat.basic
 
 -- dEAduction tactics
-import structures2      -- hypo_analysis, targets_analysis
-import utils            -- no_meta_vars
-import user_notations   -- notations that can be used in deaduction UI for a new object
-import push_neg_once    -- pushing negation just one step
-import compute
-import induction
+import deaduction_all_tactics
 
 -- dEAduction definitions
 import set_definitions
+
+-- Use classical logic
+local attribute [instance] classical.prop_decidable
 
 -------------------------
 -- dEAduction METADATA --
@@ -34,7 +33,6 @@ Display
     delta --> (-2, "∆", -1)
 -/
 
-local attribute [instance] classical.prop_decidable
 ---------------------------------------------
 -- global parameters = implicit variables --
 ---------------------------------------------
@@ -168,7 +166,14 @@ begin
   todo, todo, todo,
 end
 
-
+lemma exercise.carre_pair {n : ℕ} : (even n) ↔ (even (n^2)) :=
+/- dEAduction
+PrettyName
+  Parité et carré.
+-/
+begin
+  todo
+end
 
 
 end definitions

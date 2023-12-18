@@ -19,6 +19,7 @@ import structures2      -- hypo_analysis, targets_analysis
 import utils            -- no_meta_vars
 import user_notations   -- notations that can be used in deaduction UI for a new object
 import compute
+import push_neg_once
 
 -- dEAduction definitions
 -- import set_definitions
@@ -48,7 +49,27 @@ end
 
 end definitions
 
-section tests
+section course 
+
+lemma exercise.test_but_compute
+(u v l l' e: ℝ)
+(H: |u + v - (l+l') | < e/2 + e/2):
+|(u-l) + (v-l')| < e
+:=
+begin
+  todo
+end
+
+lemma exercise.test_triangular
+(u v l l' e: ℝ) 
+(H: |u - l| +|v -l'| < e):
+|(u-l) + (v-l')| < e
+:=
+begin
+  todo
+end
+
+
 
 lemma exercise.test_for_all_ineq
 (u : ℕ → ℝ) (l : ℝ) :
@@ -69,8 +90,7 @@ AutoTest
     assumption success=But_en_cours_atteint,
     implies success=Propriété_H7_ajoutée_au_contexte,
     forall success=Objet_ε_ajouté_au_contexte,
-    @P1 forall epsilon/2 success=La_nouvelle_propriété_sera_ajoutée_quand_l'inégalité_aura_été_vérifiée,
-    assumption success=But_en_cours_atteint,
+    @P1 forall ε/2 success=Propriété_H10_ajoutée_au_contexte,
     @P4 exists success=Nouvel_objet_n_vérifiant_la_propriété_H11,
     @O4 exists success=Il_reste_à_démontrer_que_n_convient,
     forall success=Objet_n'_ajouté_au_contexte,
@@ -94,5 +114,4 @@ end
 
 
 
-
-end tests
+end course
