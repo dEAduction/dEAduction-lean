@@ -49,7 +49,7 @@ local attribute [instance] classical.prop_decidable
 -- global parameters = implicit variables --
 ---------------------------------------------
 section course
-parameters {X Y Z: Type}
+variables {X Y Z: Type}
 
 
 open set
@@ -236,23 +236,23 @@ begin
     todo
 end
 
-example (g: X → Y) (B: set X) (y: X) : true :=
-begin
- have H1: ∀{A: set X}, ∀{x: X},
- (x ∈ A → g x ∈ g '' A), -- intros A X,
- apply exercise.image_directe,
+-- example (g: X → Y) (B: set X) (y: X) : true :=
+-- begin
+-- --  have H1: ∀{A: set X}, ∀{x: X},
+-- --  (x ∈ A → g x ∈ g '' A), -- intros A X,
+-- --  apply exercise.image_directe,
 
-have H2:  ∀{x: X},
- (x ∈ B → g x ∈ g '' B),
- apply exercise.image_directe,
+-- -- have H2:  ∀{x: X},
+-- --  (x ∈ B → g x ∈ g '' B),
+-- --  apply exercise.image_directe,
  
-have H3:  ∀{A: set X},
- (y ∈ A → g y ∈ g '' A),
-intro A, apply exercise.image_directe, 
+-- -- have H3:  ∀{A: set X},
+-- --  (y ∈ A → g y ∈ g '' A),
+-- -- intro A, apply exercise.image_directe, 
   
-have H4 := @exercise.image_directe _ _ g B,
-
-end
+-- -- have H4 := @exercise.image_directe _ _ g B,
+--   todo
+-- end
 
 
 lemma definition.image_reciproque {x:X} :
@@ -262,10 +262,10 @@ begin
     todo
 end
 
-variables (g : Y → Z)
+variables {g : Y → Z}
 
 lemma definition.composition {x:X}:
-composition g f x = g (f x)
+function.comp g f x = g (f x)
 :=
 begin
     todo,
@@ -364,7 +364,7 @@ ANCIEN SCHEMA :
 22. f(A∪B)=f(A)∪f(B)
 23. f−1(A ∩ B) = f−1(A) ∩ f−1(B) f−1(A ∪ B) = f−1(A) ∪ f−1(B)
 -/
-
+ 
 -----------------------------------------------------------
 -- Atelier 2 : images directe et réciproque, composition --
 -----------------------------------------------------------
@@ -372,7 +372,7 @@ namespace composition_et_images
 
 lemma exercise.composition_image_directe
 {A: set X} : 
-(composition g f) '' A = g '' (f '' A)
+(function.comp g f) '' A = g '' (f '' A)
 :=
 /- dEAduction
 PrettyName
@@ -380,9 +380,39 @@ PrettyName
 -/
 begin
   -- hypo_analysis,
-    todo
+    rw ensembles_et_applications.definitions.generalites.definition.double_inclusion, split,
+rw ensembles_et_applications.definitions.generalites.definition.inclusion, intro z,
+intro H1,
+rw ensembles_et_applications.definitions.applications.definition.image_directe at H1,
+cases H1 with x H2,
+cases H2 with H4 H5,
+  let z := function.comp g  f x,
+
+rw ensembles_et_applications.definitions.applications.definition.composition at H5,
+-- rw ←  ensembles_et_applications.definitions.applications.definition.composition at H5, fail!
+
+have H6 := @ensembles_et_applications.definitions.applications.exercise.image_directe _ _ (f) (A) (x),
+have H7 := H6 H4,
+have H8 := @ensembles_et_applications.definitions.applications.exercise.image_directe _ _ (g) (f '' (A)) (f x ),
+have H9 := H8 H7,
+cc,
+rw ensembles_et_applications.definitions.generalites.definition.inclusion, intro z,
+intro H10,
+rw ensembles_et_applications.definitions.applications.definition.image_directe at H10,
+cases H10 with y H11,
+rw ensembles_et_applications.definitions.applications.definition.image_directe at H11,
+cases H11 with H13 H14,
+cases H13 with x H15,
+cases H15 with H17 H18,
+have H19 := @ensembles_et_applications.definitions.applications.exercise.image_directe _ _ ((g∘f)) (A) (x),
+have H20 := H19 H17,
+rw <- H18 at H14,
+-- `[ rw ensembles_et_applications.definitions.applications.definition.composition at H14] <|> `[ simp_rw ensembles_et_applications.definitions.applications.definition.composition at H14] <|> `[ rw <- ensembles_et_applications.definitions.applications.definition.composition at H14] <|> `[ simp_rw <- ensembles_et_applications.definitions.applications.definition.composition at H14], `[ simp only [] at H14],
+-- rw ← (@ensembles_et_applications.definitions.applications.definition.composition _ _ _ _ g _) at H14,
+rw ← (@function.comp_app _ _ _ g _ _) at H14,
 end
 
+#print ensembles_et_applications.definitions.applications.definition.composition
 
 lemma exercise.composition_image_reciproque
 {C: set Z} : 
@@ -589,6 +619,11 @@ begin
     todo
 end
 
+-- #check @ensembles_et_applications.exercices.injectivite_surjectivite_composition.exercise.composition_injections
+
+-- #check @definitions.applications.theorem.image_singleton
+-- #check @exercise.injective_si_compo_injective_I
+
 lemma exercise.injective_si_compo_injective_II
 (H1 : injective (composition g f)) :
 injective f
@@ -598,7 +633,10 @@ PrettyName
     Injective si composition injective (ii)
 -/
 begin
-    todo
+    have H2 := @ensembles_et_applications.exercices.injectivite_surjectivite_composition.exercise.composition_injections _ _,
+    rotate, exact f,
+    rotate, rotate,, exact g,
+
 end
 
 lemma exercise.surjective_si_compo_surjective_I

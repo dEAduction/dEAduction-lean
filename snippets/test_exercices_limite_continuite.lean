@@ -25,6 +25,11 @@ import push_neg_once    -- pushing negation just one step
 import set_definitions
 import real_definitions
 
+-- set_option profiler true
+-- set_option pp.implicit true
+-- #print options
+set_option pp.notation false
+
 
 -- class real_number_subgroup (α : Type) := 
 -- (subgroup : ((α = ℕ) ∨ (α = ℤ) ∨ (α = ℚ) ∨ (α = ℝ)) )
@@ -202,6 +207,7 @@ PrettyName
   Inégalité triangulaire
 -/
 begin
+  hypo_analysis,
   intros x y, exact abs_add x y 
 end
 
@@ -267,6 +273,35 @@ ImplicitUse
 begin
   refl
 end
+
+set_option pp.notation true
+
+example : ∀ ε >0, ∃ δ>0, ∀ y : ℝ, |y|< δ → |2 * y| < ε :=
+begin
+  intros ε H1,
+  -- First time : 
+  let δ : ℝ := by sorry,
+  -- At point (*), the previous line should be replaced by:
+  -- let δ : ℝ := ε / 2, have H3: δ = ε/2, refl, 
+  -- have hδ : 0 < δ := _,  -- , rotate,
+  use δ,
+  split, rotate,
+  -- exact hδ,
+  -- refine ⟨δ, hδ, _⟩,
+  intros y H2,
+  calc |2 * y| = |(2 : ℝ)| * |y| : by rw abs_mul
+  ... = 2 * |y| : by rw abs_of_nonneg; todo
+  ... < 2 * δ : by linarith [H2]
+  ... ≤ ε : _,
+  rotate, rotate,
+  -- have H: δ = ε / 2, sorry, 
+  -- use ε / 2, 
+  -- (*)
+  all_goals { dsimp [δ] },
+  linarith,
+  linarith,
+end
+
 
 lemma definition.increasing_seq
 {u : ℕ → ℝ} :
@@ -545,7 +580,8 @@ Description
 begin
 --   rw definitions.definition.limit,
 -- rw definitions.definition.limit at H H',
--- intro ε, intro H1,
+intro ε, intro H1,
+have H2: ε/2 > 0, rotate, have H3 := H (ε/2) H2,
 -- have H2 := H _ H1,
 -- have H3 := H' _ H1,
 -- cases H2 with n H4,
@@ -556,27 +592,30 @@ begin
 -- -- norm_num at H10,
 -- rw H7 at H10,
   -- todo,
-  rw limit,
-  intro ε, intro H1,
-  rw limit at H H',
-  have H2: ((ε/2):ℝ) > 0, rotate, have H3 := H (ε/2) H2, rotate 1, solve1 {linarith only [H1] }, rotate,
-  have H4: ((ε/2):ℝ) > 0, rotate, have H5 := H' (ε/2) H4, rotate 1, solve1 {assumption}, rotate,
-  cases H3 with n H6,
-  cases H5 with n' H7,
-  use max n n',
-  intro n'', intro H8,
-  have H9: (n'':ℕ) ≥ n, rotate, have H10 := H6 n'' H9, rotate 1, solve1 {norm_num at *, tautology }, rotate,
-  have H11: (n'':ℕ) ≥ n', rotate, have H12 := H7 n'' H11, rotate 1, solve1 {norm_num at *, tautology }, rotate,
-  have H13 := @definitions.generalites.valeur_absolue.theorem.inegalite_triangulaire,
-  hypo_analysis,
-  analyse_contexte_brut,
-  -- rw generalites.valeur_absolue.theorem.majoration_valeur_absolue at H10 H12,
+  -- rw limit,
+  -- intro ε, intro H1,
+  -- rw limit at H H',
+  -- have H2: ((ε/2):ℝ) > 0, rotate, have H3 := H (ε/2) H2, rotate 1, solve1 {linarith only [H1] }, rotate,
+  -- have H4: ((ε/2):ℝ) > 0, rotate, have H5 := H' (ε/2) H4, rotate 1, solve1 {assumption}, rotate,
+  -- cases H3 with n H6,
+  -- cases H5 with n' H7,
+  -- use max n n',
+  -- intro n'', intro H8,
+  -- have H9: (n'':ℕ) ≥ n, rotate, have H10 := H6 n'' H9, rotate 1, solve1 {norm_num at *, tautology }, rotate,
+  -- have H11: (n'':ℕ) ≥ n', rotate, have H12 := H7 n'' H11, rotate 1, solve1 {norm_num at *, tautology }, rotate,
+  -- have H13 := @definitions.generalites.valeur_absolue.theorem.inegalite_triangulaire,
+  -- hypo_analysis,
+  -- analyse_contexte_brut,
+  -- -- rw generalites.valeur_absolue.theorem.majoration_valeur_absolue at H10 H12,
   -- rw generalites.valeur_absolue.theorem.majoration_valeur_absolue,
   -- cases H12 with Ha Hb, cases H10 with Hc Hd,
   -- split,
   -- linarith only [Ha, Hc],
   -- linarith only [Hb, Hc, Hd],
+  todo
 end
+
+set_option pp.notation true
 
 lemma exercise.limite_unique
 (u : ℕ → ℝ) (l : ℝ)(l' : ℝ) (H : limit u l) (H' : limit u l') :
@@ -586,7 +625,23 @@ l = l'
 PrettyName
   (*) Unicité de la limite
 -/
+
+
 begin
+by_contradiction H1,
+cases (classical.em (l' > l)) with H2 H3,
+let e := (l' - l)/100, have Def4 : e = (l' - l)/100, refl,
+have H5: (e:ℝ) > ((0): @real), rotate, have H6 := H e (H5), rotate 2, solve1 {rw Def4 at *, norm_num at *, compute_n 10 },
+cases H6 with N H7,
+have H9 := H' e H5,
+cases H9 with N' H10,
+have H12: (max N N') ≥ N, rotate, have H13 := @H7 (max N N') (H12), rotate 2, solve1 {rw Def4 at *, norm_num at *, compute_n 10 },
+have H14: (max N N') ≥ N', rotate, have H15 := @H10 (max N N') (H14), rotate 2, solve1 {rw Def4 at *, norm_num at *, compute_n 10 },
+let a:= ((u (max N N') ) - l), have Def4: a = ((u (max N N') ) - l), refl,
+let b:= ((u (max N N') ) - l'), have Def5: b = ((u (max N N') ) - l'), refl,
+
+have H16 := @definitions.generalites.valeur_absolue.theorem.inegalite_triangulaire _ _ ((u (max N N') ) - l) ((u (max N N') ) - l'),
+
   -- by_contradiction,
   -- wlog Hll': l < l',
   -- -- exact lt_or_gt_of_ne a,

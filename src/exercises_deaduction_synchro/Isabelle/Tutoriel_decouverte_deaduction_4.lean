@@ -58,7 +58,7 @@ local attribute [instance] classical.prop_decidable
 section course
 open nat
 open set
-parameters {X : Type}
+variables {X : Type}
 
 variables (P Q R: Prop) -- NOT global
 notation [parsing_only] P ` \and ` Q := P ∧ Q
@@ -67,7 +67,7 @@ notation [parsing_only]  ` \not ` P := ¬ P
 notation [parsing_only]  P ` \implies ` Q := P → Q
 notation [parsing_only]  P ` \iff ` Q := P ↔ Q
 
-parameters {m n k: ℕ}
+variables {m n k: ℕ}
 
 namespace decouverte_methodes_preuves
 /- dEAduction

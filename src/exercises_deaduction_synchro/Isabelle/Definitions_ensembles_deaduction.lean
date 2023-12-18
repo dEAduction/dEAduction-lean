@@ -42,8 +42,8 @@ local attribute [instance] classical.prop_decidable
 -- global parameters = implicit variables --
 ---------------------------------------------
 section course
-parameters {X Y Z: Type}
-parameters {n p l m : ℕ}
+variables {X Y Z: Type}
+variables {n p l m : ℕ}
 
 open set
 open nat  -- car on travaille dans l'ensemble ℕ
