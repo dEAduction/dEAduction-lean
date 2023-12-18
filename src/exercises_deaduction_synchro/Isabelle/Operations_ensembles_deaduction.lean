@@ -39,6 +39,8 @@ Institution
     Université de Lorraine
 Description
     Ce cours correspond à un cours standard de théorie "élémentaire" des ensembles.
+Display
+    set.prod --> ( -2, " × ", -1)
 -/
 
 local attribute [instance] classical.prop_decidable
