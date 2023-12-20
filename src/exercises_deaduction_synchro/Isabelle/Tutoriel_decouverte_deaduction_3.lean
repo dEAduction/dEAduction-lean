@@ -61,7 +61,7 @@ variables {m n k: ℕ}
 
 
 lemma theorem.croissance1 
-{ x y : ℝ} :
+{x y : ℝ} :
 ((0 <= x) \and (0<=y) \and (x <=y)) → x^2 <= y^2
 :=
 /- dEAduction
@@ -171,9 +171,9 @@ F (x) = 0
 :=
 /- dEAduction
 PrettyName
-    Utilisation d'une définition dans un but -- PBME AFFICHAGE F(x)
+    Utilisation d'une définition dans un but
 Description
-    Utilisation d'une définition dans un but -- PBME AFFICHAGE F(x)
+    Utilisation d'une définition dans un but
 AvailableLogic
      equal  implies
 AvailableTheorems
@@ -190,9 +190,9 @@ lemma exercise.defbilan  { x  : ℝ} :
 :=
 /- dEAduction
 PrettyName
-    Utilisation d'une définition, d'un théorème -- PBME AFFICHAGE F(x)
+    Utilisation d'une définition, d'un théorème
 Description
-    Utilisation d'une définition, d'un théorème -- PBME AFFICHAGE F(x)
+    Utilisation d'une définition, d'un théorème
 AvailableLogic
     or and equal  implies iff 
 AvailableTheorems
