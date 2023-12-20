@@ -30,7 +30,6 @@ Description
     Premier essai d'arithmétique
 Display
     divise --> (-2, " | ", -1)
-    delta --> (-2, "∆", -1)
 -/
 
 ---------------------------------------------
@@ -157,13 +156,14 @@ PrettyName
   Diviseurs mutuels
 -/
 begin
-  rintro ⟨H1 , H2⟩,
-  cases H1 with d H1,
-  cases H2 with d' H2,
-  rw H1 at H2,
-  by_cases a=0, rotate,
-  have H2b : (d * d' =1),
-  todo, todo, todo,
+  todo
+  -- rintro ⟨H1 , H2⟩,
+  -- cases H1 with d H1,
+  -- cases H2 with d' H2,
+  -- rw H1 at H2,
+  -- by_cases a=0, rotate,
+  -- have H2b : (d * d' =1),
+  -- todo, todo, todo,
 end
 
 lemma exercise.carre_pair {n : ℕ} : (even n) ↔ (even (n^2)) :=

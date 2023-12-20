@@ -138,6 +138,7 @@ match e with
 | `(sing %%x) := return ("SET_EXTENSION1", [x])
 | `(_root_.set %%X) := return ("SET", [X])
 | `(prod %%A %%B) := return ("SET_PRODUCT", [A, B])
+| `(set.prod %%A %%B) := return ("SET_PRODUCT", [A, B])
 | `(prod.mk %%x %%y) := return ("COUPLE", [x, y])
 -- set in extension, e.g. A = {x | P x} or A = {x:X | P x} :
 | `(@set_of %%X %%P) := match P with
@@ -219,6 +220,7 @@ match e with
 | `(has_mul.mul %%a %%b) := return ("MULT", [a, b]) -- TODO: distinguish types/numbers
 -- | `(%%a × %%b) := return ("PRODUCT", [a, b]) -- TODO: distinguish types/numbers
 | `(%%a / %%b) := return ("DIV", [a, b])
+| `(has_inv.inv %%a) := return ("INV", [a])
 | `(%%a ^ %%b) := return ("POWER", [a, b])
 | `(real.sqrt %%a) := return ("SQRT", [a])
 ------------------------------ Leaves with data ---------------------------

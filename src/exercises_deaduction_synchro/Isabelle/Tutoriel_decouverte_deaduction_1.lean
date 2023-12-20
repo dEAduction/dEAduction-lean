@@ -1,20 +1,26 @@
-import data.set
+/-
+This is a d∃∀duction file providing a tutorial.
+-/
+
+-- Lean standard imports
 import tactic
-
--- dEAduction imports
-import structures2
-import utils          
-import push_neg_once
-import compute          -- tactics for computation, used by the Goal! button
-
 import data.real.basic
+
+-- dEAduction tactics
+-- structures2 and utils are vital
+import deaduction_all_tactics
+-- import structures2      -- hypo_analysis, targets_analysis
+-- import utils            -- no_meta_vars
+-- import compute_all      -- Tactics for the compute buttons
+-- import push_neg_once    -- Pushing negation just one step
+-- import induction        -- Induction theorems
+
+-- dEAduction definitions
+-- import set_definitions
 import real_definitions
 
--- General principles :
--- Type should be defined as parameters, in order to be implicit everywhere
--- other parameters are implicit in definitions, i.e. defined using '{}' (e.g. {A : set X} )
--- but explicit everywhere else, i.e. defined using '()' (e.g. (A : set X) )
--- each definition must be an iff statement (since it will be called with 'rw' or 'symp_rw')
+-- Use classical logic
+local attribute [instance] classical.prop_decidable
 
 
 /- dEAduction
@@ -32,19 +38,12 @@ Description
     mais plutôt de voir comment l'interface fonctionne sur ces énoncés.
 AvailableExercises
     NONE
-DefaultAvailableProof
+AvailableProof
     NONE
-DefaultAvailableMagic
-    Assumption
+AvailableCompute
+    NONE
 -/
 
-
--- logic names ['and', 'or', 'not', 'implies', 'iff', 'forall', 'exists']
--- proofs names ['proof_methods', 'new_object', 'apply']
--- magic names ['compute', 'assumption']
-
-
-local attribute [instance] classical.prop_decidable
 ---------------------------------------------
 -- global parameters = implicit variables --
 ---------------------------------------------
