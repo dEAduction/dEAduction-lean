@@ -70,7 +70,18 @@ PrettyName
  Découverte des méthodes de preuves
 -/
 
-lemma exercise.cas1 (H1 : m*m = n*m) (H2: ( (m*m = m*n) \and non(m=0) ) → (m=n) ) :
+lemma theorem.simplifier (H: m ≠ 0):
+ (m*m = n*m)  → (m=n)
+:=
+/- dEAduction
+PrettyName
+    Simplifier une égalité entre produits
+-/
+begin
+    todo
+end
+
+lemma exercise.cas1 (H1 : m*m = n*m) :
   (m=0) \or (m=n)
 :=
 /- dEAduction
@@ -86,9 +97,33 @@ begin
     todo
 end
 
+lemma theorem.valeur_absolue_de_positif :
+∀ x : ℝ,
+((0 ≤ x) → (abs x = x)) :=
+/- dEAduction
+PrettyName
+  Valeur absolue d'un nombre positif
+-/
+begin
+  intro x, exact abs_of_nonneg,
+end
 
-lemma exercise.cas2 { x : ℝ} (H1 : |x-1| +|2*x-3| =6)  (H2: ∀ y : ℝ, (y>=0) → ( | y| =y) ) (H3: ∀ y : ℝ, (y<0) → ( | y| = -y) ) (H4 : (x-1 <0)→ (2*x - 3<0) ) :
-( x=10/3 ) \or (x = -2/3)
+lemma theorem.valeur_absolue_de_negatif :
+∀ x : ℝ,
+((x < 0) → (abs x = -x)) :=
+/- dEAduction
+PrettyName
+  Valeur absolue d'un nombre négatif
+-/
+begin
+  todo
+end
+
+
+lemma exercise.cas2 {x : ℝ} 
+(H1 : |x-1| +|2*x-3| =6)
+(H4 : (x-1 <0)→ (2*x - 3<0) ) :
+(x=10/3) \or (x = -2/3)
 :=
 /- dEAduction
 PrettyName
@@ -107,7 +142,7 @@ end
 
 -- ( not(x=-3)) → (not( (x+1)/(x+3) = 1)) 
 
-lemma exercise.contraposee0 { x y : ℝ} :
+lemma exercise.contraposee0 {x y : ℝ} :
  ( not(x=y)) → (not( (x-1)*(y+1) = (x+1)*(y-1)))
 :=
 /- dEAduction
@@ -123,8 +158,11 @@ begin
     todo
 end
 
-lemma exercise.contraposee0b { x y : ℝ} (H1: ∀ a : ℝ, ∀ b : ℝ, (a+a*b =a*(1+b))) (H2: ∀ a : ℝ, ∀ b : ℝ,  (a*b +b = (a+1)*b)) (H3:  ∀ a : ℝ, ∀ b : ℝ, ( (a*b = 0)  → ( (a=0) \or (b=0) ) ) ):
- ( not(x=-1) \and not(y=-1) ) → (not( (x+ x*y)+ (1+ y) =0))
+lemma exercise.contraposee0b
+{x y : ℝ} (H1: ∀ a : ℝ, ∀ b : ℝ, (a+a*b =a*(1+b)))
+(H2: ∀ a : ℝ, ∀ b : ℝ,  (a*b +b = (a+1)*b))
+(H3:  ∀ a : ℝ, ∀ b : ℝ, ((a*b = 0)  → ( (a=0) \or (b=0) ))):
+(not(x=-1) \and not(y=-1)) → (not( (x+ x*y)+ (1+ y) =0))
 :=
 /- dEAduction
 PrettyName
@@ -168,7 +206,7 @@ begin
   todo
 end
 
-lemma theorem.nonimpair {m:nat} : (non((impair m))) ↔ (pair m) :=
+lemma theorem.nonimpair {m:nat} : (not((impair m))) ↔ (pair m) :=
 /- dEAduction
 PrettyName
   Non (Impair )
@@ -179,7 +217,7 @@ begin
  todo
 end
 
-lemma theorem.nonpair {m:nat} : (non((pair m))) ↔ (impair m) :=
+lemma theorem.nonpair {m:nat} : (not((pair m))) ↔ (impair m) :=
 /- dEAduction
 PrettyName
   Non (Pair )
@@ -191,8 +229,8 @@ begin
 end
 
 
-lemma exercise.contraposee1  { n : ℕ}:
- (  impair (n*n) ) → (impair n )
+lemma exercise.contraposee1  {n : ℕ}:
+ (impair (n*n) ) → (impair n)
 :=
 /- dEAduction
 PrettyName
@@ -207,8 +245,8 @@ begin
     todo
 end
 
-lemma exercise.contraposee2  { n : ℕ}:
- (  pair (n*n) ) → (pair n )
+lemma exercise.contraposee2 {n : ℕ}:
+ (pair (n*n) ) → (pair n)
 :=
 /- dEAduction
 PrettyName
@@ -225,8 +263,8 @@ end
 
 
 
-lemma exercise.contraposee3 { a  : ℝ} :
- (  ∀ y > (0:ℝ), a <= y) → (a<=0)
+lemma exercise.contraposee3 {a : ℝ}:
+ (∀ y > (0:ℝ), a <= y) → (a<=0)
 :=
 /- dEAduction
 PrettyName
@@ -245,7 +283,10 @@ begin
 end
 
 
-lemma exercise.absurde1 { x  : ℝ} (H1: not(x=-3) ) (H2: ∀ a : ℝ, ∀ b : ℝ,  ((a/b = 1) \and (not(b=0)) ) ↔ (a =b ) ) (H3: ∀ a : ℝ, ( not( x+a =0)) ↔ not (x = -a) ):
+lemma exercise.absurde1
+{x : ℝ} (H1: not(x=-3) )
+(H2: ∀ a : ℝ, ∀ b : ℝ,  ((a/b = 1) \and (not(b=0)) ) ↔ (a =b))
+(H3: ∀ a : ℝ, ( not( x+a =0)) ↔ not (x = -a) ) :
 not( (x+1) / (x+3) =1 )
 :=
 /- dEAduction
@@ -265,9 +306,10 @@ begin
 end
 
 
-end
 
-lemma theorem.produit_egal_un {m n :ℤ} : (m*n = 1)  <-> (( (m=1 ) \and (n=1) ) \or ( (m=-1) \and (n=-1) ) )  :=
+lemma theorem.produit_egal_un
+{m n :ℤ} : (m*n = 1)  <-> (((m=1) \and (n=1)) \or ((m=-1) \and (n=-1)))
+:=
 /- dEAduction
 PrettyName
   Produit d'entiers relatif égal à 1
@@ -278,10 +320,8 @@ begin
  todo
 end
 
-lemma exercise.absurde2   {m n : ℤ}  
- :
-non(18*m +6*n = 1)
-
+lemma exercise.absurde2 {m n : ℤ} :
+not(18*m +6*n = 1)
 :=
 /- dEAduction
 PrettyName
@@ -302,7 +342,9 @@ begin
     todo
 end
 
-lemma theorem.identite_remarquable {a b : ℤ}  :  a^2 - b^2 = (a-b)*(a+b) :=
+lemma theorem.identite_remarquable {a b : ℤ} :
+a^2 - b^2 = (a-b)*(a+b)
+:=
 /- dEAduction
 PrettyName
   Identité Remarquable a^2 -b^2
@@ -313,10 +355,9 @@ begin
  todo
 end
 
-lemma exercise.absurde3  {n : ℤ}  (Hypothese: non(n=0)) 
-
-:
-non(∃ m, n^2 +1 = m^2)
+lemma exercise.absurde3
+{n : ℤ}  (Hypothese: not(n=0)) :
+not(∃ m, n^2 +1 = m^2)
 :=
 /- dEAduction
 PrettyName
@@ -353,7 +394,8 @@ begin
  todo
 end
 
-lemma theorem.condition_etre_pair  : ∀ m :ℕ, ( (∃ k, m = 2*k ) -> (pair m) ) :=
+lemma theorem.condition_etre_pair :
+∀ m :ℕ, ( (∃ k, m = 2*k ) -> (pair m) ) :=
 /- dEAduction
 PrettyName
   Condition pour être pair
@@ -364,8 +406,9 @@ begin
   todo
 end
 
-lemma exercise.absurde4  {m n : ℕ}   (H1: pair m) (H2: impair n) :
-non(estquotiententier n m )
+lemma exercise.absurde4
+{m n : ℕ}   (H1: pair m) (H2: impair n) :
+not(estquotiententier n m )
 :=
 /- dEAduction
 PrettyName
@@ -380,12 +423,14 @@ AvailableMagic
     assumption
 -/
 begin
-    sorry
+    todo
 end
 
 
-lemma definition.intersection_deux_ensembles {A B : set X} {x : X} :
-x ∈ A ∩ B ↔ ( x ∈ A ∧ x ∈ B) :=
+lemma definition.intersection_deux_ensembles
+{A B : set X} {x : X} :
+x ∈ A ∩ B ↔ ( x ∈ A ∧ x ∈ B)
+:=
 /- dEAduction
 PrettyName
     Intersection de deux ensembles
@@ -398,7 +443,7 @@ end
 
 lemma definition.ensemble_non_vide
 (A: set X) :
-(non (A = ∅) ) ↔ ∃ x : X, x ∈ A
+(not (A = ∅) ) ↔ ∃ x : X, x ∈ A
 :=
 /- dEAduction
 ImplicitUse
@@ -443,11 +488,7 @@ begin
 end
 
 
-
-
 end decouverte_methodes_preuves
-
-
 
 end course
 
