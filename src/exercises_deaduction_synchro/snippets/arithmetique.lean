@@ -49,9 +49,21 @@ universe u
 
 open set
 
-------------------
--- COURSE TITLE --
-------------------
+namespace logique
+
+lemma theorem.disjonction_eqv_implication (P Q: Prop) :
+(P ∨ Q) ↔ ((not P) → Q)
+:= 
+/- dEAduction
+PrettyName
+    Disjonction sous forme d'implication
+-/
+begin
+  tautology,
+end
+
+end logique
+
 namespace definitions
 /- dEAduction
 PrettyName
@@ -112,7 +124,7 @@ end
 lemma exercise.even_or_odd : ∀n: nat, (even n or odd n) :=
 /- dEAduction
 PrettyName
-  Pair ou impair
+  Pair ou impair I
 -/
 begin
     -- intro n, induction n with n H1,
@@ -124,6 +136,14 @@ begin
     todo
 end
 
+lemma exercise.even_or_odd2 : ∀n: nat, (not (even n)) ↔ odd n :=
+/- dEAduction
+PrettyName
+  Pair ou impair II
+-/
+begin
+    todo
+end
 
 lemma exercise.mul_divides {a b c : ℤ} : divides a b → divides a (b*c) :=
 /- dEAduction
