@@ -271,7 +271,7 @@ end
 
 lemma exercise.composition_image_reciproque
 (f: X→ Y) (g: Y → Z) (C: set Z) : 
-(composition g f) ⁻¹' C = f ⁻¹' (g ⁻¹' C)
+(function.comp g f) ⁻¹' C = f ⁻¹' (g ⁻¹' C)
 :=
 /- dEAduction
 PrettyName
@@ -388,7 +388,7 @@ open theorie_des_ensembles
 variables {X Y Z : EspaceTopologique} [topologie X] [topologie Y] [topologie Z]
 
 lemma exercise.compo_continue (f : X → Y) (g : Y → Z) (H1 : continue f) (H2 : continue g):
-continue (composition g f) :=
+continue (g ∘ f) :=
 begin
   todo
 end

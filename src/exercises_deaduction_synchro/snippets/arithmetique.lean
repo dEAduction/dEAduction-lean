@@ -51,6 +51,15 @@ open set
 
 namespace logique
 
+lemma definition.iff {P Q : Prop} : (P ↔ Q) ↔ ((P → Q) ∧ (Q → P)) :=
+/- dEAduction
+PrettyName
+    Equivalence logique
+-/
+begin
+  exact iff_def,
+end
+
 lemma theorem.disjonction_eqv_implication (P Q: Prop) :
 (P ∨ Q) ↔ ((not P) → Q)
 := 
