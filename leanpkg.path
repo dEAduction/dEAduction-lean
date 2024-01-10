@@ -4,6 +4,7 @@ path ./src
 path ./src/lean_src_deaduction_synchro
 path ./src/exercises_deaduction_synchro
 path ./src/exercises_deaduction_synchro/experimental
+path ./src/exercises_deaduction_synchro/Tutoriels
 path ./src/exercises_deaduction_synchro/tests
 path ./snippets
 path ./snippets/new_exercises_for_testing_deaduction_synchro

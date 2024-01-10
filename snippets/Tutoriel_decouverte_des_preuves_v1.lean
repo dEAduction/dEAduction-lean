@@ -61,7 +61,7 @@ parameters {m n k: ℕ}
 
 namespace decouverte_methodes_preuves
 
-lemma exercise.cas1 (H1 : m*m = n*m) (H2: ( (m*m = m*n) \and non(m=0) ) → (m=n) ) :
+lemma exercise.cas1 (H1 : m*m = n*m) (H2: ( (m*m = m*n) \and not(m=0) ) → (m=n) ) :
   (m=0) \or (m=n)
 :=
 /- dEAduction
@@ -178,7 +178,7 @@ begin
   refl
 end
 
-lemma theorem.nonimpair {m:nat} : (non((impair m))) ↔ (pair m) :=
+lemma theorem.nonimpair {m:nat} : (not((impair m))) ↔ (pair m) :=
 /- dEAduction
 PrettyName
   Non (Impair )
@@ -189,7 +189,7 @@ begin
     todo
 end
 
-lemma theorem.nonpair {m:nat} : (non((pair m))) ↔ (impair m) :=
+lemma theorem.nonpair {m:nat} : (not((pair m))) ↔ (impair m) :=
 /- dEAduction
 PrettyName
   Non (Pair )
@@ -288,7 +288,7 @@ end
 
 
 lemma exercise.absurde2  {m n : ℕ}  (H1: ∀ n :ℕ, (∃ k, n = 2*k ) ↔ pair n ) (H2: ∀ k : ℕ, ∀ l : ℕ, k*(2*l) =2*(k*l) ) (H3: pair m) (H4: impair n) :
-non(estquotiententier n m )
+not(estquotiententier n m )
 :=
 /- dEAduction
 PrettyName

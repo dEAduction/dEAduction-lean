@@ -6,5 +6,5 @@ cp -v -r src/exercises_deaduction_synchro/* ../../PycharmProjects/dEAduction/src
 echo "Copy exercises for testing -> tests..."
 cp -v snippets/new_exercises_for_testing_deaduction_synchro/* ../../PycharmProjects/dEAduction/tests/lean_files/courses/
 echo "Copy test files -> tests..."
-cp -v src/tests/* ../../PycharmProjects/dEAduction/tests/autotest_buttons/
+cp -v src/tests/* ../../PycharmProjects/dEAduction/src/deaduction/share/autotests/autotest_buttons/
 
