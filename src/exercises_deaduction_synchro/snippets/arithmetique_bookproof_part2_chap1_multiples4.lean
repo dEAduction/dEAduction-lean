@@ -117,6 +117,28 @@ begin
   refl
 end
 
+lemma theorem.not_odd {a:ℤ} : (not (odd a)) ↔ (even a ) :=
+/- dEAduction
+PrettyName
+  Non Impair équivalent à Pair
+ImplicitUse
+  True
+-/
+begin
+  refl
+end
+
+lemma theorem.not_even {a:ℤ} : (not (even a)) ↔ (odd a) :=
+/- dEAduction
+PrettyName
+  Non Pair équivalent à Impair
+ImplicitUse
+  True
+-/
+begin
+  refl
+end
+
 lemma definition.divides {a b : ℤ} : (divides a b) ↔ (∃ c, b = a * c) :=
 /- dEAduction
 PrettyName
