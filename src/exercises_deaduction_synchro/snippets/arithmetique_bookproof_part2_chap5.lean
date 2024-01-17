@@ -21,7 +21,7 @@ local attribute [instance] classical.prop_decidable
 -------------------------
 /- dEAduction
 Title
-    Arithmétique - BOOK OF PROOF PART II - Chapitre 4 
+    Arithmétique - BOOK OF PROOF PART II - Chapitre 5 
 Author
     Frédéric Le Roux, Thomas Richard
 Institution
