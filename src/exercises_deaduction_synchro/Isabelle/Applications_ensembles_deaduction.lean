@@ -2,33 +2,36 @@
 Feuille d'exercice pour travailler les applications sur les ensembles - Exercices classiques
 -/
 
-import data.set
+-- Lean standard imports
 import tactic
+import data.real.basic
+import data.set
+
 
 -- dEAduction tactics
-import structures2      -- hypo_analysis, targets_analysis
-import utils            -- no_meta_vars
-import user_notations   -- notations that can be used in deaduction UI for a new object
-import push_neg_once
-
+-- structures2 and utils are vital
+import deaduction_all_tactics
+-- import structures2      -- hypo_analysis, targets_analysis
+-- import utils            -- no_meta_vars
+-- import compute_all      -- Tactics for the compute buttons
+-- import push_neg_once    -- Pushing negation just one step
+-- import induction        -- Induction theorems
 
 -- dEAduction definitions
 import set_definitions
+--import real_definitions
 
--- General principles :
--- Type should be defined as parameters, in order to be implicit everywhere
--- other parameters are implicit in definitions, i.e. defined using '{}' (e.g. {A : set X} )
--- but explicit everywhere else, i.e. defined using '()' (e.g. (A : set X) )
--- each definition must be an iff statement or an equality
--- (since it will be called with 'rw' or 'symp_rw')
+-- Use classical logic
+local attribute [instance] classical.prop_decidable
+
+
+
+
 
 -------------------------
 -- dEAduction METADATA --
 -------------------------
--- logic names ['and', 'or', 'negate', 'implicate', 'iff', 'forall', 'exists']
--- proofs names ['use_proof_methods', 'new_object', 'apply', 'assumption']
--- magic names ['compute']
--- proof methods names ['cbr', 'contrapose', 'absurdum', 'sorry']
+
 
 /- dEAduction
 Title
@@ -49,7 +52,7 @@ local attribute [instance] classical.prop_decidable
 -- global parameters = implicit variables --
 ---------------------------------------------
 section course
-variables {X Y Z: Type}
+parameters {X Y Z: Type}
 
 
 open set
@@ -190,11 +193,20 @@ begin
     todo
 end
 
+-- def composition {X Y Z : Type} (g₀ : Y → Z) (f₀ : X → Y) := λx:X, g₀ (f₀ x)
+
+-- lemma definition.composition {x:X}:
+-- (composition g f) x = g (f x)
+-- :=
+-- begin
+--     todo
+-- end
+
 lemma definition.composition {x:X}:
-composition g f x = g (f x)
+ function.comp g f x = g (f x)
 :=
 begin
-    todo,
+   refl,
 end
 
 lemma definition.egalite_fonctions (f' : X → Y) :
@@ -426,7 +438,7 @@ end
 lemma exercise.image_reciproque_composition
 (C: set Z)
 :
-((composition g f) )⁻¹' C = f ⁻¹' (g ⁻¹' C)
+((function.comp g f) )⁻¹' C = f ⁻¹' (g ⁻¹' C)
 :=
 /- dEAduction
 PrettyName
@@ -459,7 +471,7 @@ variables (g : Y → Z) (h : X → Z)
 lemma exercise.composition_injections
 (H1 : injective f) (H2 : injective g)
 :
-injective (composition g f)
+injective (function.comp g f)
 :=
 /- dEAduction
 PrettyName
@@ -471,7 +483,7 @@ end
 
 lemma exercise.composition_surjections
 (H1 : surjective f) (H2 : surjective g) :
-surjective (composition g f)
+surjective (function.comp g f)
 :=
 /- dEAduction
 PrettyName
@@ -482,7 +494,7 @@ begin
 end
 
 lemma exercise.injective_si_compo_injective
-(H1 : injective (composition g f)) :
+(H1 : injective (function.comp g f)) :
 injective f
 :=
 /- dEAduction
@@ -494,7 +506,7 @@ begin
 end
 
 lemma exercise.surjective_si_compo_surjective
-(H1 : surjective (composition g f)) :
+(H1 : surjective (function.comp g f)) :
 surjective g
 :=
 /- dEAduction
@@ -506,7 +518,7 @@ begin
 end
 
 lemma exercise.surjective_si_inj_et_compo_surjective
-(H1 : surjective (composition g f)) (H2 : injective g) :
+(H1 : surjective (function.comp g f)) (H2 : injective g) :
 surjective f
 :=
 /- dEAduction
@@ -518,7 +530,7 @@ begin
 end
 
 lemma exercise.injective_si_surj_et_compo_injective
-(H1 : injective (composition g f)) (H2 : surjective f) :
+(H1 : injective (function.comp g f)) (H2 : surjective f) :
 injective g
 :=
 /- dEAduction
@@ -530,7 +542,7 @@ begin
 end
 
 lemma exercise.comp_comp_f {f : X → X}
-(H : f= composition (composition f f) f )  :
+(H : f= function.comp (function.comp f f) f )  :
 injective f ↔  surjective f
 :=
 /- dEAduction
