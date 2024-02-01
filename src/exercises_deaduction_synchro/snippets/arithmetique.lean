@@ -30,6 +30,7 @@ Description
     Premier essai d'arithmétique
 Display
     divise --> (-2, " | ", -1)
+    prime --> (-1, " est premier")
 -/
 
 ---------------------------------------------
@@ -116,6 +117,27 @@ begin
   refl
 end
 
+-- Does not work
+-- lemma auxiliary_theorem.not_even_is_odd {a:ℤ} :
+-- (not (odd a)) ↔ even a :=
+-- begin
+--     todo
+-- end
+
+
+lemma theorem.not_even_is_odd {a:ℤ} :
+(not (even a)) ↔ odd a :=
+/- dEAduction
+PrettyName
+  Pair et impair
+AuxiliaryDefinitions
+  auxiliary_theorem.not_even_is_odd
+-/
+begin
+  todo
+end
+
+
 lemma definition.divides {a b : ℤ} : (divides a b) ↔ (∃ c, b = a * c) :=
 /- dEAduction
 PrettyName
@@ -128,6 +150,18 @@ begin
 end
 
 -- Nb premier
+lemma definition.prime {p: ℕ} : (prime p) ↔ (∀ n:ℕ, divides n p → (n=1 or n=p)) :=
+/- dEAduction
+PrettyName
+  Nombre premier
+-/
+begin
+  todo
+end
+
+
+
+
 
 
 end definitions
@@ -160,11 +194,7 @@ II - Types de preuves
 
 -/
 --------------------------------
-namespace provisoirement_non_classes
-/- dEAduction
-PrettyName
-  Exos à classer
--/
+-- namespace provisoirement_non_classes
 
 -- lemma exercise.  :
 --  :=
@@ -176,22 +206,10 @@ PrettyName
 --   todo
 -- end
 
-lemma exercise.divise_transitive (a b c : ℤ) :
-(divides a b) ∧ (divides b c) → (divides a c) :=
-/- dEAduction
-PrettyName
-  
-Description
-  implication et existence.
--/
-begin
-  todo
-end
-
 -- TODO: preuves de cas similaire
 
 
-end provisoirement_non_classes
+-- end provisoirement_non_classes
 
 
 --------------------------------
@@ -264,6 +282,17 @@ PrettyName
   Carré d'un nombre pair
 Description
   Le carré d'un nombre pair est pair
+-/
+begin
+  todo
+end
+
+
+lemma exercise.divise_transitive (a b c : ℤ) :
+(divides a b) ∧ (divides b c) → (divides a c) :=
+/- dEAduction
+PrettyName
+  La divisibilité est transitive  
 -/
 begin
   todo
@@ -350,7 +379,7 @@ lemma exercise.multiple_de_quatre (n:ℕ) :
 divides 4 (1+(-1)^n*(2*n-1)) :=
 /- dEAduction
 PrettyName
-  Des multiples de quatre
+  (**) Des multiples de quatre
 -/
 begin
   todo
@@ -429,7 +458,7 @@ begin
 end
 
 lemma exercise.divise1 {a b c : ℤ}:
-not (divides a (b*c)) → not (divides a b)
+(not (divides a (b*c))) → not (divides a b)
 :=
 /- dEAduction
 PrettyName
@@ -442,11 +471,11 @@ begin
 end
 
 lemma exercise.divise2 {a : ℤ}:
-not (divides 4 a ) → not (even a)
+(not (divides 4 (a^2) )) → (odd a)
 :=
 /- dEAduction
 PrettyName
-  Divise I
+  Impair si divise pas
 Description
   (à écrire)
 -/
@@ -460,7 +489,7 @@ lemma exercise.somme_et_produit {a b : ℤ}:
 :=
 /- dEAduction
 PrettyName
-  Comme et produit
+  Somme et produit
 Description
   (à écrire)
 -/
@@ -565,8 +594,6 @@ end
 
 end preuve_par_recurrence
 
-namespace disproofs
-
 namespace contre_exemples
 /- dEAduction
 PrettyName
@@ -583,8 +610,6 @@ begin
 end
 
 end contre_exemples
-
-end disproofs
 
 namespace autres_exercices
 
